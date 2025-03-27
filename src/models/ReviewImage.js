@@ -1,20 +1,25 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
+import Review from "./Review.js";
 
-const Cart = sequelize.define("Cart", {
+const ReviewImage = sequelize.define("ReviewImage", {
   id: {
     type: DataTypes.INTEGER,
-    autoIncrement: true, 
+    autoIncrement: true,
     primaryKey: true,
   },
-  customerId: {
+  reviewId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: "Customers",
+      model: Review,
       key: "id",
     },
     onDelete: "CASCADE",
+  },
+  filename: {  
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -26,9 +31,4 @@ const Cart = sequelize.define("Cart", {
   },
 });
 
-Cart.associate = (models) => {
-  Cart.belongsTo(models.Customer, { foreignKey: "customerId", as: "customer" });
-  Cart.hasMany(models.CartItem, { foreignKey: "cartId", as: "items" });
-};
-
-export default Cart;
+export default ReviewImage;

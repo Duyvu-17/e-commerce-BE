@@ -11,7 +11,7 @@ app.use("/api", routes);
 app.use("/api-admin", adminRoutes);
 
 
-db.sequelize.sync({ alert: true }) 
+db.sequelize.sync({ alter: true })
   .then(() => console.log("✅ Database đã đồng bộ!"))
   .catch(err => console.error("❌ Lỗi đồng bộ DB:", err));
 

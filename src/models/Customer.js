@@ -13,7 +13,7 @@ const Customer = sequelize.define("Customer", {
     allowNull: false,
     unique: true,
     validate: {
-      isEmail: true, // Đảm bảo email hợp lệ
+      isEmail: true, 
     },
   },
   password: {
