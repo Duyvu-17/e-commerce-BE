@@ -20,7 +20,7 @@ CustomerPaymentMethod.belongsTo(PayPalInfo, { foreignKey: "paymentId", constrain
 CustomerPaymentMethod.belongsTo(CreditCardInfo, { foreignKey: "paymentId", constraints: false });
 
 Customer.hasOne(CustomerInfo, { foreignKey: "customerId", as: "info" });
-CustomerInfo.belongsTo(Customer, { foreignKey: "customerId" });
+CustomerInfo.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
 
 Product.hasMany(ProductItem, { foreignKey: "productId", as: "productItems" });
 ProductItem.belongsTo(Product, { foreignKey: "productId" });

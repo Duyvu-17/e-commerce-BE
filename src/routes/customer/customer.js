@@ -1,9 +1,9 @@
 const router = express.Router();
 import express from "express";
-import userController from "../controllers/userController.js";
+import customerController from "../../controllers/customer/customerController.js";
+import authenticateJWT from "../../middleware/authenticateJWT.js";
 
-router.get("/profile", userController.getProfile);
-router.put("/profile", userController.updateProfile);
-router.get("/", userController.getAllUsers);
+router.get("/profile", authenticateJWT , customerController.getProfile);
+router.put("/profile", authenticateJWT , customerController.updateProfile);
 
-module.exports = router;
+export default router;
