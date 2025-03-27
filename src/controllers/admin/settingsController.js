@@ -1,7 +1,7 @@
-const Settings = require("../../models/Settings");
+import Settings from "../../models/Settings.js";
 
 // 📌 Lấy danh sách cài đặt
-exports.getSettings = async (req, res) => {
+const getSettings = async (req, res) => {
   try {
     const settings = await Settings.findAll();
     res.status(200).json(settings);
@@ -12,7 +12,7 @@ exports.getSettings = async (req, res) => {
 };
 
 // 📌 Cập nhật cài đặt
-exports.updateSettings = async (req, res) => {
+const updateSettings = async (req, res) => {
   try {
     const { key, value } = req.body;
 
@@ -34,3 +34,11 @@ exports.updateSettings = async (req, res) => {
     res.status(500).json({ message: "Lỗi server khi cập nhật cài đặt" });
   }
 };
+
+
+
+const settingsController = {
+  getSettings, updateSettings
+};
+
+export default settingsController;

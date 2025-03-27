@@ -1,6 +1,7 @@
-const express = require("express");
+import express from "express";
+import shippingController from "../controllers/shippingController.js";
 const router = express.Router();
-const shippingController = require("../controllers/shippingController");
+
 
 router.get("/addresses", shippingController.getAddresses);
 router.post("/addresses", shippingController.addAddress);

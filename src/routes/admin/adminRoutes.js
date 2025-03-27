@@ -1,23 +1,25 @@
-const express = require("express");
+import express from "express";
+import authController from "../../controllers/admin/authController.js";
+import customerRoutes from "./customerRoutes.js";
+import productRoutes from "./productRoutes.js";
+import orderRoutes from "./orderRoutes.js";
+import categoryRoutes from "./categoryRoutes.js";
+import settingsRoutes from "./settingsRoutes.js";
+import dashboardRoutes from "./dashboardRoutes.js";
+import  Middleware from "../../middleware/authMiddleware.js";
+
 const adminRoutes = express.Router();
 
-const { login, register } = require("../../controllers/admin/authController");
-const customerRoutes = require("./customerRoutes");
-const productRoutes = require("./productRoutes");
-const orderRoutes = require("./orderRoutes");
-const categoryRoutes = require("./categoryRoutes");
-const settingsRoutes = require("./settingsRoutes");
-const dashboardRoutes = require("./dashboardRoutes");
-const { adminMiddleware, authMiddleware } = require("../../middleware/authMiddleware");
 
 // 🔹 Các route này KHÔNG cần xác thực
-adminRoutes.post("/login", login);
-adminRoutes.post("/register", register);
-adminRoutes.post("/register", register);
+adminRoutes.post("/login", authController.login);
+adminRoutes.post("/register", authController.register);
+adminRoutes.post("/verify-Token", authController.verifyToken);
+adminRoutes.post("/logout", authController.logout);
 
 // 🔹 Các route dưới đây yêu cầu xác thực
-adminRoutes.use(authMiddleware); 
-adminRoutes.use(adminMiddleware);
+adminRoutes.use(Middleware.authMiddleware); 
+adminRoutes.use(Middleware.adminMiddleware);
 
 adminRoutes.use("/customers", customerRoutes);
 adminRoutes.use("/products", productRoutes);
@@ -26,4 +28,4 @@ adminRoutes.use("/categories", categoryRoutes);
 adminRoutes.use("/settings", settingsRoutes);
 adminRoutes.use("/dashboard", dashboardRoutes);
 
-module.exports = adminRoutes;
+export default adminRoutes;

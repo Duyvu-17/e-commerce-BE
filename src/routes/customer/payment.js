@@ -1,6 +1,8 @@
-const express = require("express");
+import express from "express";
+import paymentController from "../controllers/paymentController.js"; // Thêm .js
+
 const router = express.Router();
-const paymentController = require("../controllers/paymentController");
+
 
 router.get("/methods", paymentController.getPaymentMethods);
 router.post("/methods", paymentController.addPaymentMethod);

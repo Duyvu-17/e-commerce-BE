@@ -1,8 +1,9 @@
-require("dotenv").config();
-const express = require("express");
-const routes = require("./src/routes/customer/index");
-const adminRoutes = require("./src/routes/admin/adminRoutes");
-const { sequelize } = require("./src/models");
+import "dotenv/config"; 
+import express from "express";
+import routes from "./src/routes/customer/index.js";
+import adminRoutes from "./src/routes/admin/adminRoutes.js";
+import db from "./src/models/index.js";
+
 
 const app = express();
 app.use(express.json());
@@ -10,7 +11,7 @@ app.use("/api", routes);
 app.use("/api-admin", adminRoutes);
 
 
-sequelize.sync({ alert: true }) 
+db.sequelize.sync({ alert: true }) 
   .then(() => console.log("✅ Database đã đồng bộ!"))
   .catch(err => console.error("❌ Lỗi đồng bộ DB:", err));
 

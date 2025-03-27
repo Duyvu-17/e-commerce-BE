@@ -1,6 +1,7 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const Product = require("./Product");
+import  DataTypes  from "sequelize";
+import sequelize from "../config/database.js";
+import Product from "./Product.js";
+
 
 const ProductItem = sequelize.define("ProductItem", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -19,4 +20,4 @@ const ProductItem = sequelize.define("ProductItem", {
 });
 
 
-module.exports = ProductItem;
+export default ProductItem;

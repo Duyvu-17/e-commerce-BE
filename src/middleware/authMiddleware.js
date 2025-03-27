@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 
 const adminMiddleware = (req, res, next) => {
@@ -16,7 +16,7 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.employee = decoded; 
+    req.employee = decoded;
     next();
   } catch (error) {
     res.status(401).json({ message: "Token không hợp lệ!" });
@@ -25,4 +25,7 @@ const authMiddleware = (req, res, next) => {
 
 
 
-module.exports = { authMiddleware, adminMiddleware };
+const Middleware = {
+  authMiddleware, adminMiddleware
+};
+export default Middleware;

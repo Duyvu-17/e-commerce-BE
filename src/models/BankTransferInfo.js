@@ -1,5 +1,6 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+import  DataTypes  from "sequelize";
+import sequelize from "../config/database.js";
+
 
 const BankTransferInfo = sequelize.define("BankTransferInfo", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -9,4 +10,4 @@ const BankTransferInfo = sequelize.define("BankTransferInfo", {
   swiftCode: { type: DataTypes.STRING },
 });
 
-module.exports = BankTransferInfo;
+export default BankTransferInfo;

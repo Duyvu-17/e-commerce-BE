@@ -1,20 +1,39 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+import  DataTypes  from "sequelize";
+import sequelize from "../config/database.js";
+import Cart from "./Cart.js";
+import ProductItem from "./ProductItem.js";
 
-const Cart = sequelize.define("Cart", {
+const CartItem = sequelize.define("CartItem", {
   id: {
     type: DataTypes.INTEGER,
-    defaultValue: DataTypes.INTEGER,
+    autoIncrement: true,
     primaryKey: true,
   },
-  customerId: {
-    type: DataTypes.INTEGER, 
+  cartId: {
+    type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: "Customers",
+      model: "Carts",
       key: "id",
     },
     onDelete: "CASCADE",
+  },
+  productItemId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: "ProductItems",
+      key: "id",
+    },
+    onDelete: "CASCADE",
+  },
+  quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1,
+    validate: {
+      min: 1,
+    },
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -26,9 +45,12 @@ const Cart = sequelize.define("Cart", {
   },
 });
 
-Cart.associate = (models) => {
-  Cart.belongsTo(models.Customer, { foreignKey: "customerId", as: "customer" });
-  Cart.hasMany(models.CartItem, { foreignKey: "cartId", as: "items" });
+CartItem.associate = () => {
+  CartItem.belongsTo(Cart, { foreignKey: "cartId", as: "cart" });
+  CartItem.belongsTo(ProductItem, {
+    foreignKey: "productItemId",
+    as: "productItem",
+  });
 };
 
-module.exports = Cart;
+export default CartItem;

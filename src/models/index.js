@@ -1,40 +1,39 @@
-const sequelize = require("../config/database");
-const Customer = require("./Customer");
-const CustomerPaymentMethod = require("./CustomerPaymentMethod");
-const BankTransferInfo = require("./BankTransferInfo");
-const PayPalInfo = require("./PayPalInfo");
-const CreditCardInfo = require("./CreditCardInfo");
-const CustomerInfo = require("./CustomerInfo");
-const ProductItem = require("./ProductItem");
-const Product = require("./Product");
-const ProductImage = require("./ProductImage");
-const Employee = require("./Employee");
+import Customer from "./Customer.js";
+import CustomerPaymentMethod from "./CustomerPaymentMethod.js";
+import BankTransferInfo from "./BankTransferInfo.js";
+import PayPalInfo from "./PayPalInfo.js";
+import CreditCardInfo from "./CreditCardInfo.js";
+import CustomerInfo from "./CustomerInfo.js";
+import ProductItem from "./ProductItem.js";
+import Product from "./Product.js";
+import ProductImage from "./ProductImage.js";
+import Employee from "./Employee.js";
+import Category from "./Category.js";
+import sequelize from "../config/database.js";  
 
-// Quan hệ giữa Customer và CustomerPaymentMethod
-Customer.hasMany(CustomerPaymentMethod, { foreignKey: "userId" });
-CustomerPaymentMethod.belongsTo(Customer, { foreignKey: "userId" });
+// Thiết lập quan hệ giữa các bảng
+Customer.hasMany(CustomerPaymentMethod, { foreignKey: "CustomerId" });
+CustomerPaymentMethod.belongsTo(Customer, { foreignKey: "CustomerId" });
 
-// Liên kết CustomerPaymentMethod với các phương thức thanh toán
 CustomerPaymentMethod.belongsTo(BankTransferInfo, { foreignKey: "paymentId", constraints: false });
 CustomerPaymentMethod.belongsTo(PayPalInfo, { foreignKey: "paymentId", constraints: false });
 CustomerPaymentMethod.belongsTo(CreditCardInfo, { foreignKey: "paymentId", constraints: false });
 
-// Liên kết Customer với CustomerInfo
 Customer.hasOne(CustomerInfo, { foreignKey: "customerId", as: "info" });
 CustomerInfo.belongsTo(Customer, { foreignKey: "customerId" });
 
-// Liên kết Product với ProductItem và ProductImage
-Product.hasMany(ProductItem, { foreignKey: "productId", as: "items" });
+Product.hasMany(ProductItem, { foreignKey: "productId", as: "productItems" });
 ProductItem.belongsTo(Product, { foreignKey: "productId" });
 
-ProductItem.hasMany(ProductImage, { foreignKey: "productItemId", as: "images" });
+ProductItem.hasMany(ProductImage, { foreignKey: "productItemId", as: "productsImages" });
 ProductImage.belongsTo(ProductItem, { foreignKey: "productItemId" });
 
+Product.belongsTo(Category, { foreignKey: "categoryId", as: "category" });
+Category.hasMany(Product, { foreignKey: "categoryId", as: "products" });
 
-
-// Thêm Employee vào database
+// Export sequelize dưới dạng default
 const db = {
-  sequelize,
+  sequelize, 
   Customer,
   CustomerPaymentMethod,
   BankTransferInfo,
@@ -45,6 +44,7 @@ const db = {
   ProductItem,
   ProductImage,
   Employee,
+  Category
 };
 
-module.exports = db;
+export default db;

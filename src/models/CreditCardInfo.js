@@ -1,5 +1,6 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+import  DataTypes  from "sequelize";
+import sequelize from "../config/database.js";
+
 
 const CreditCardInfo = sequelize.define("CreditCardInfo", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -9,4 +10,4 @@ const CreditCardInfo = sequelize.define("CreditCardInfo", {
   cvv: { type: DataTypes.STRING, allowNull: false },
 });
 
-module.exports = CreditCardInfo;
+export default CreditCardInfo;

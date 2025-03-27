@@ -1,5 +1,6 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+import  DataTypes  from "sequelize";
+import sequelize from "../config/database.js";
+
 
 const CustomerPaymentMethod = sequelize.define("CustomerPaymentMethod", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -11,4 +12,4 @@ const CustomerPaymentMethod = sequelize.define("CustomerPaymentMethod", {
   paymentId: { type: DataTypes.INTEGER, allowNull: false }, 
 });
 
-module.exports = CustomerPaymentMethod;
+export default CustomerPaymentMethod;

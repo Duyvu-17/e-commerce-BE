@@ -1,5 +1,5 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database"); 
+import  DataTypes  from "sequelize";
+import sequelize from "../config/database.js";
 
 const Wishlist = sequelize.define("Wishlist", {
   id: {
@@ -37,4 +37,4 @@ Wishlist.associate = (models) => {
   Wishlist.belongsTo(models.Product, { foreignKey: "productId", as: "product" });
 };
 
-module.exports = Wishlist;
+export default Wishlist;

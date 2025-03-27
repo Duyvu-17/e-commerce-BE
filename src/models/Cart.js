@@ -1,5 +1,6 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+import  DataTypes  from "sequelize";
+import sequelize from "../config/database.js";
+
 
 const Cart = sequelize.define("Cart", {
   id: {
@@ -31,4 +32,4 @@ Cart.associate = (models) => {
   Cart.hasMany(models.CartItem, { foreignKey: "cartId", as: "items" });
 };
 
-module.exports = Cart;
+export default Cart;

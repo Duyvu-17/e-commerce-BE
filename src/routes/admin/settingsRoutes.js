@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
+import settingsController from "../../controllers/admin/settingsController.js";
+
 const router = express.Router();
-const { getSettings, updateSettings } = require("../../controllers/admin/settingsController");
 
+router.get("/", settingsController.getSettings);
+router.put("/",  settingsController.updateSettings);
 
-router.get("/", getSettings);
-router.put("/",  updateSettings);
-
-module.exports = router;
+export default router;

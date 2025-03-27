@@ -1,9 +1,9 @@
-const Order = require("../../models/");
-const OrderItem = require("../../models/OrderItem");
-const Customer = require("../../models/Customer");
+import Order from "../../models/Order.js";
+import OrderItem from "../../models/OrderItem.js";
+import Customer from "../../models/Customer.js";
 
-// 📌 Lấy danh sách đơn hàng
-exports.getOrders = async (req, res) => {
+
+const getOrders = async (req, res) => {
   try {
     const orders = await Order.findAll({
       attributes: ["id", "user_id", "total_price", "status", "createdAt"],
@@ -22,8 +22,7 @@ exports.getOrders = async (req, res) => {
   }
 };
 
-// 📌 Lấy chi tiết đơn hàng
-exports.getOrderById = async (req, res) => {
+const getOrderById = async (req, res) => {
   try {
     const { id } = req.params;
     const order = await Order.findByPk(id, {
@@ -52,7 +51,7 @@ exports.getOrderById = async (req, res) => {
 };
 
 // 📌 Cập nhật trạng thái đơn hàng
-exports.updateOrderStatus = async (req, res) => {
+const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -71,7 +70,7 @@ exports.updateOrderStatus = async (req, res) => {
 };
 
 // 📌 Xóa đơn hàng
-exports.deleteOrder = async (req, res) => {
+const deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const order = await Order.findByPk(id);
@@ -87,3 +86,12 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ message: "Lỗi server khi xóa đơn hàng" });
   }
 };
+
+const orderController = {
+  getOrders,
+  getOrderById,
+  updateOrderStatus,
+  deleteOrder,
+};
+
+export default orderController;

@@ -1,24 +1,23 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
+import authRoutes from "./auth.js";
+// import customerRoutes from "./customer.js";
+import productRoutes from "./products.js";
+// import cartRoutes from "./cart.js";
+// import orderRoutes from "./orders.js";
+// import wishlistRoutes from "./wishlist.js";
+// import paymentRoutes from "./payment.js";
+// import shippingRoutes from "./shipping.js";
 
-// Import các routes con
-const authRoutes = require("./auth");
-// const customerRoutes = require("./customer");
-// const productRoutes = require("./products");
-// const cartRoutes = require("./cart");
-// const orderRoutes = require("./orders");
-// const wishlistRoutes = require("./wishlist");
-// const paymentRoutes = require("./payment");
-// const shippingRoutes = require("./shipping");
+const router = express.Router();
 
 // Sử dụng các routes
 router.use("/auth", authRoutes);
 // router.use("/users", customerRoutes);
-// router.use("/products", productRoutes);
+router.use("/products", productRoutes);
 // router.use("/cart", cartRoutes);
 // router.use("/orders", orderRoutes);
 // router.use("/wishlist", wishlistRoutes);
 // router.use("/payment", paymentRoutes);
 // router.use("/shipping", shippingRoutes);
 
-module.exports = router;
+export default router;

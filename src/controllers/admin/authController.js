@@ -1,6 +1,7 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const Employee = require("../../models/Employee");
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import Employee from "../../models/Employee.js";
+
 
 const generateToken = (employee) => {
   return jwt.sign(
@@ -134,5 +135,9 @@ const verifyToken = async (req, res) => {
 const logout = (req, res) => {
   res.json({ message: "Đăng xuất thành công!" });
 };
+const authController = {
+  register, login, verifyToken, logout
+};
 
-module.exports = { register, login, verifyToken, logout };
+export default authController;
+

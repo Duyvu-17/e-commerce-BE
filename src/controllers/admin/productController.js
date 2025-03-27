@@ -1,8 +1,7 @@
-const Product = require("../../models/Product");
-const ProductItem = require("../../models/ProductItem");
+import Product from "../../models/Product.js";
+import ProductItem from "../../models/ProductItem.js";
 
-// 📌 Lấy danh sách sản phẩm
-exports.getProducts = async (req, res) => {
+const getProducts = async (req, res) => {
   try {
     const products = await Product.findAll({
       attributes: ["id", "name", "description", "category_id", "createdAt"],
@@ -21,8 +20,7 @@ exports.getProducts = async (req, res) => {
   }
 };
 
-// 📌 Lấy thông tin chi tiết sản phẩm
-exports.getProductById = async (req, res) => {
+const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
     const product = await Product.findByPk(id, {
@@ -46,23 +44,22 @@ exports.getProductById = async (req, res) => {
   }
 };
 
-// 📌 Thêm mới sản phẩm
-exports.createProduct = async (req, res) => {
+const createProduct = async (req, res) => {
   try {
     const { name, description, category_id, product_items } = req.body;
 
     const newProduct = await Product.create({ name, description, category_id });
 
-    if (product_items && product_items.length > 0) {
+    if (product_items?.length) {
       await Promise.all(
-        product_items.map(async (item) => {
-          await ProductItem.create({
+        product_items.map(async (item) =>
+          ProductItem.create({
             product_id: newProduct.id,
             sku: item.sku,
             price: item.price,
             qty: item.qty,
-          });
-        })
+          })
+        )
       );
     }
 
@@ -73,8 +70,7 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-// 📌 Cập nhật sản phẩm
-exports.updateProduct = async (req, res) => {
+const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, category_id } = req.body;
@@ -92,8 +88,7 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-// 📌 Xóa sản phẩm
-exports.deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const product = await Product.findByPk(id);
@@ -109,3 +104,13 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Lỗi server khi xóa sản phẩm" });
   }
 };
+
+const productController = {
+  getProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};
+
+export default productController;

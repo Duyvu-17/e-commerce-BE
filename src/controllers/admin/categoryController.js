@@ -1,7 +1,7 @@
-const Category = require("../../models/Category")
+import Category from "../../models/Category.js";
 
 // 📌 Lấy danh sách danh mục
-exports.getCategories = async (req, res) => {
+const getCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({
       attributes: ["id", "name", "image", "status", "createdAt"],
@@ -15,7 +15,7 @@ exports.getCategories = async (req, res) => {
 };
 
 // 📌 Lấy chi tiết danh mục theo ID
-exports.getCategoryById = async (req, res) => {
+const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
     const category = await Category.findByPk(id, {
@@ -34,7 +34,7 @@ exports.getCategoryById = async (req, res) => {
 };
 
 // 📌 Tạo danh mục mới
-exports.createCategory = async (req, res) => {
+const createCategory = async (req, res) => {
   try {
     const { name, image, status } = req.body;
 
@@ -51,7 +51,7 @@ exports.createCategory = async (req, res) => {
 };
 
 // 📌 Cập nhật danh mục
-exports.updateCategory = async (req, res) => {
+const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, image, status } = req.body;
@@ -70,7 +70,7 @@ exports.updateCategory = async (req, res) => {
 };
 
 // 📌 Xóa danh mục
-exports.deleteCategory = async (req, res) => {
+const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const category = await Category.findByPk(id);
@@ -86,3 +86,13 @@ exports.deleteCategory = async (req, res) => {
     res.status(500).json({ message: "Lỗi server khi xóa danh mục" });
   }
 };
+
+const categoryController = {
+  getCategories,
+  getCategoryById,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+};
+
+export default categoryController;

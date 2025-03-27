@@ -1,6 +1,7 @@
-const express = require("express");
+import express from "express";
+import wishlistController from "../controllers/wishlistController.js";
 const router = express.Router();
-const wishlistController = require("../controllers/wishlistController");
+
 
 router.get("/", wishlistController.getWishlist);
 router.post("/:productId", wishlistController.addToWishlist);

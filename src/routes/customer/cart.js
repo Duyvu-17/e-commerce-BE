@@ -1,6 +1,7 @@
-const express = require("express");
+import express from "express";
+import cartController from "../controllers/cartController.js";
+
 const router = express.Router();
-const cartController = require("../controllers/cartController");
 
 router.get("/", cartController.getCart);
 router.post("/", cartController.addToCart);
