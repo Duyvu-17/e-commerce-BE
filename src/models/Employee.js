@@ -14,7 +14,7 @@ const Employee = sequelize.define("Employee", {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: true,  // Chỉ tạo chỉ mục duy nhất cho email
     validate: {
       isEmail: true,
     },
@@ -26,7 +26,8 @@ const Employee = sequelize.define("Employee", {
   phoneNumber: {
     type: DataTypes.STRING,
     allowNull: true,
-    unique: true,
+    // Xóa unique: true nếu không cần thiết
+    // unique: true, 
   },
   address: {
     type: DataTypes.STRING,
@@ -52,6 +53,13 @@ const Employee = sequelize.define("Employee", {
     type: DataTypes.ENUM("active", "inactive", "banned"),
     defaultValue: "active",
   },
+}, {
+  indexes: [
+    {
+      unique: true,
+      fields: ['email'],  
+    },
+  ],
 });
 
 export default Employee;

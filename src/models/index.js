@@ -14,6 +14,7 @@ import Cart from "./Cart.js";
 import CartItem from "./CartItem.js";
 import Review from "./Review.js";
 import ReviewImage from "./ReviewImage.js";
+import PasswordReset from "./PasswordReset.js";
 
 // 🏦 Thiết lập quan hệ giữa Customer và PaymentMethod
 Customer.hasMany(CustomerPaymentMethod, { foreignKey: "customerId" });
@@ -55,6 +56,9 @@ Review.belongsTo(Product, { foreignKey: "productId", as: "product" });
 
 Review.hasMany(ReviewImage, { foreignKey: "reviewId", as: "images" });
 ReviewImage.belongsTo(Review, { foreignKey: "reviewId" });
+
+// Thiết lập quan hệ với model Customer
+PasswordReset.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
 
 
 // Export sequelize dưới dạng default

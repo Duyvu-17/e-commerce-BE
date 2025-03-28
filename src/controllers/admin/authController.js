@@ -12,44 +12,55 @@ const generateToken = (employee) => {
 };
 
 const register = async (req, res) => {
+  console.log(req.body); // Để kiểm tra dữ liệu trong request
   try {
-    const { name, email, password, role } = req.body;
+    const { fullName, email, password, role } = req.body;
 
-    if (!name || !email || !password) {
+    // Kiểm tra thông tin yêu cầu
+    if (!fullName || !email || !password) {
       return res.status(400).json({ message: "Vui lòng nhập đầy đủ họ tên, email và mật khẩu!" });
     }
 
+    // Kiểm tra định dạng email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Email không hợp lệ!" });
     }
+
+    // Kiểm tra mật khẩu
     if (password.length < 6) {
       return res.status(400).json({ message: "Mật khẩu phải có ít nhất 6 ký tự!" });
     }
+
+    // Kiểm tra vai trò
     const validRoles = ["admin", "super-admin"];
     if (role && !validRoles.includes(role)) {
       return res.status(400).json({ message: "Vai trò không hợp lệ!" });
     }
 
+    // Kiểm tra email đã tồn tại
     const existingEmployee = await Employee.findOne({ where: { email } });
     if (existingEmployee) {
       return res.status(400).json({ message: "Email đã tồn tại!" });
     }
 
+    // Mã hóa mật khẩu
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Tạo mới nhân viên
     const newEmployee = await Employee.create({
-      name,
-      email,
+      fullName, 
       password: hashedPassword,
-      role: role || "admin",
+      email,
+      role: role || "admin", 
     });
 
+    // Trả về phản hồi thành công
     res.status(201).json({
       message: "Tạo tài khoản thành công!",
       employee: {
         id: newEmployee.id,
-        name: newEmployee.name,
+        fullName: newEmployee.fullName,
         email: newEmployee.email,
         role: newEmployee.role,
       }
@@ -62,6 +73,8 @@ const register = async (req, res) => {
 
 
 const login = async (req, res) => {
+  console.log(req.body);
+  
   try {
     const { email, password } = req.body;
 
