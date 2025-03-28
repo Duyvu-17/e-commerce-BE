@@ -12,7 +12,6 @@ import sequelize from "../config/database.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
-console.log(JWT_EXPIRES_IN);
 
 const CLIENT_URL = process.env.CLIENT_URL;
 const EMAIL_USER = process.env.EMAIL_USER;
