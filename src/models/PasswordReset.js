@@ -45,7 +45,7 @@ const PasswordReset = sequelize.define("PasswordReset", {
 }, {
   indexes: [
     {
-      fields: ['customerId', 'used', 'createdAt']
+      fields: ['customerId', 'usedAt', 'createdAt']
     },
     {
       unique: true,
