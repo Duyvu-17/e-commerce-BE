@@ -59,7 +59,7 @@ const productController = {
         attributes: ["id", "name", "description"],
         include: [
           {
-            model: ProductItem,
+            model: ProductImage,
             as: "productItems",
             attributes: ["id", "sku", "price", "stock"],
             include: [

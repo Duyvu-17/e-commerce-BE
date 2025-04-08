@@ -1,65 +1,69 @@
-import DataTypes from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
 
-const Employee = sequelize.define("Employee", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  fullName: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,  // Chỉ tạo chỉ mục duy nhất cho email
-    validate: {
-      isEmail: true,
+class Employee extends Model {
+  static associate(models) {
+    // Quan hệ với bảng Blog
+    Employee.hasMany(models.Blog, { foreignKey: 'author_id' });
+    Employee.hasMany(models.ContactMessage, { foreignKey: 'assigned_to' });
+    Employee.hasMany(models.OrderTracking, { foreignKey: 'updated_by' });
+    Employee.hasMany(models.InventoryHistory, { foreignKey: 'changed_by' });
+    
+    // Quan hệ với Role
+    Employee.belongsTo(models.Role, { foreignKey: 'role_id' }); 
+  }
+}
+
+Employee.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  phoneNumber: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    // Xóa unique: true nếu không cần thiết
-    // unique: true, 
-  },
-  address: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  dob: {
-    type: DataTypes.DATEONLY, 
-    allowNull: true,
-  },
-  gender: {
-    type: DataTypes.ENUM("male", "female", "other"),
-    allowNull: true,
-  },
-  avatar: {
-    type: DataTypes.STRING, 
-    allowNull: true,
-  },
-  role: {
-    type: DataTypes.ENUM("super-admin", "admin", "moderator", "staff"),
-    defaultValue: "staff",
-  },
-  status: {
-    type: DataTypes.ENUM("active", "inactive", "banned"),
-    defaultValue: "active",
-  },
-}, {
-  indexes: [
-    {
+    email: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
       unique: true,
-      fields: ['email'],  
     },
-  ],
-});
+    full_name: {
+      type: DataTypes.STRING(255),
+    },
+    password: {
+      type: DataTypes.STRING(255),
+    },
+    avatar: {
+      type: DataTypes.STRING(255),
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    role_id: {  
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Roles',
+        key: 'id',
+      },
+      allowNull: false,
+    },  
+    status: {
+      type: DataTypes.ENUM('active', 'inactive'),
+      defaultValue: 'active',
+      allowNull: false,
+    },
+    refreshToken: { 
+      type: DataTypes.STRING(255),
+      allowNull: true, 
+    },
+  },
+  
+  {
+    sequelize,
+    modelName: 'Employee',
+    tableName: 'Employee',
+    timestamps: false,
+  }
+);
 
 export default Employee;

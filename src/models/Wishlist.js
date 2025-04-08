@@ -1,40 +1,52 @@
-import  DataTypes  from "sequelize";
+// models/Wishlist.js
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
 
-const Wishlist = sequelize.define("Wishlist", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  customerId: {
-    type: DataTypes.INTEGER, 
-    allowNull: false,
-    references: {
-      model: "Customers",
-      key: "id",
-    },
-    onDelete: "CASCADE",
-  },
-  productId: {
-    type: DataTypes.INTEGER, 
-    allowNull: false,
-    references: {
-      model: "Products",
-      key: "id",
-    },
-    onDelete: "CASCADE",
-  },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-});
+class Wishlist extends Model {
+  static associate(models) {
+    Wishlist.belongsTo(models.Customer, { foreignKey: 'customer_id' });
+    Wishlist.belongsTo(models.Product, { foreignKey: 'product_id' });
+  }
+}
 
-
-Wishlist.associate = (models) => {
-  Wishlist.belongsTo(models.Customer, { foreignKey: "customerId", as: "customer" });
-  Wishlist.belongsTo(models.Product, { foreignKey: "productId", as: "product" });
-};
+Wishlist.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    customer_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Customer',
+        key: 'id',
+      },
+    },
+    product_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Product',
+        key: 'id',
+      },
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    sequelize,
+    modelName: 'Wishlist',
+    tableName: 'Wishlist',
+    timestamps: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ['customer_id', 'product_id'],
+      },
+    ],
+  }
+);
 
 export default Wishlist;

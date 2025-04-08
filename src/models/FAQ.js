@@ -1,30 +1,38 @@
-// models/Cart.js
+// models/FAQ.js
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
 
-class Cart extends Model {
+class FAQ extends Model {
   static associate(models) {
-    Cart.belongsTo(models.Customer, { foreignKey: 'customer_id' });
-    Cart.hasMany(models.CartItem, { foreignKey: 'cart_id' });
-    Cart.hasMany(models.Orders, { foreignKey: 'cart_id' });
+    // No associations
   }
 }
 
-Cart.init(
+FAQ.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    customer_id: {
-      type: DataTypes.INTEGER,
+    question: {
+      type: DataTypes.TEXT,
       allowNull: false,
-      unique: true,
-      references: {
-        model: 'Customer',
-        key: 'id',
-      },
+    },
+    answer: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    category: {
+      type: DataTypes.STRING(255),
+    },
+    display_order: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
     created_at: {
       type: DataTypes.DATE,
@@ -37,10 +45,10 @@ Cart.init(
   },
   {
     sequelize,
-    modelName: 'Cart',
-    tableName: 'Cart',
+    modelName: "FAQ",
+    tableName: "FAQ",
     timestamps: false,
   }
 );
 
-export default Cart;
+export default FAQ;

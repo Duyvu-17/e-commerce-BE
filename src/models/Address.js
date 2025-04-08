@@ -1,14 +1,14 @@
-// models/CustomerInfo.js
+// models/Address.js
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database.js';
 
-class CustomerInfo extends Model {
+class Address extends Model {
   static associate(models) {
-    CustomerInfo.belongsTo(models.Customer, { foreignKey: 'customer_id' });
+    Address.belongsTo(models.Customer, { foreignKey: 'customer_id' });
   }
 }
 
-CustomerInfo.init(
+Address.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -23,31 +23,48 @@ CustomerInfo.init(
         key: 'id',
       },
     },
-    avatar: {
+    title: {
       type: DataTypes.STRING(255),
     },
-    fullname: {
+    address_line_1: {
       type: DataTypes.STRING(255),
     },
-    first_name: {
+    address_line_2: {
       type: DataTypes.STRING(255),
     },
-    last_name: {
+    country: {
       type: DataTypes.STRING(255),
     },
-    birth_date: {
-      type: DataTypes.DATE,
+    city: {
+      type: DataTypes.STRING(255),
+    },
+    postal_code: {
+      type: DataTypes.STRING(255),
+    },
+    landmark: {
+      type: DataTypes.STRING(255),
     },
     phone_number: {
       type: DataTypes.STRING(255),
     },
+    is_default: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    deleted_at: {
+      type: DataTypes.DATE,
+    },
   },
   {
     sequelize,
-    modelName: 'CustomerInfo',
-    tableName: 'CustomerInfo',
+    modelName: 'Address',
+    tableName: 'Address',
     timestamps: false,
   }
 );
 
-export default CustomerInfo;
+export default Address;

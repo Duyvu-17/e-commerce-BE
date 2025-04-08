@@ -1,37 +1,36 @@
-// models/Settings.js
+// models/Shipping.js
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
 
-class Settings extends Model {
+class Shipping extends Model {
   static associate(models) {
-    // Không có mối quan hệ
+    Shipping.hasMany(models.Orders, { foreignKey: 'shipping_id' });
   }
 }
 
-Settings.init(
+Shipping.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    setting_key: {
+    name: {
       type: DataTypes.STRING(255),
-      unique: true,
       allowNull: false,
-    },
-    setting_value: {
-      type: DataTypes.TEXT,
-    },
-    setting_group: {
-      type: DataTypes.STRING(255),
     },
     description: {
       type: DataTypes.TEXT,
     },
-    is_public: {
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+    },
+    estimated_days: {
+      type: DataTypes.INTEGER,
+    },
+    is_active: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      defaultValue: true,
     },
     created_at: {
       type: DataTypes.DATE,
@@ -44,10 +43,10 @@ Settings.init(
   },
   {
     sequelize,
-    modelName: "Settings",
-    tableName: "Settings",
+    modelName: 'Shipping',
+    tableName: 'Shipping',
     timestamps: false,
   }
 );
 
-export default Settings;
+export default Shipping;

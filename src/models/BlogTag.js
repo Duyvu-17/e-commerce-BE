@@ -1,37 +1,41 @@
-// models/PayPalInfo.js
+// models/BlogTag.js
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
 
-class PayPalInfo extends Model {
+class BlogTag extends Model {
   static associate(models) {
-    PayPalInfo.belongsTo(models.CustomerPaymentMethod, { foreignKey: 'payment_method_id' });
+    // No additional associations needed as this is a through table
   }
 }
 
-PayPalInfo.init(
+BlogTag.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    payment_method_id: {
+    blog_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'CustomerPaymentMethod',
+        model: 'Blog',
         key: 'id',
       },
     },
-    paypal_email: {
-      type: DataTypes.STRING(255),
+    tag_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Tag',
+        key: 'id',
+      },
     },
   },
   {
     sequelize,
-    modelName: 'PayPalInfo',
-    tableName: 'PayPalInfo',
+    modelName: 'BlogTag',
+    tableName: 'BlogTag',
     timestamps: false,
   }
 );
 
-export default PayPalInfo;
+export default BlogTag;

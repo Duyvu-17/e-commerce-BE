@@ -1,17 +1,57 @@
-import { DataTypes } from "sequelize";
+// models/CustomerPaymentMethod.js
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
-import Customer from "./Customer.js"; // Đảm bảo import đúng
 
-const CustomerPaymentMethod = sequelize.define("CustomerPaymentMethod", {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  customerId: { type: DataTypes.INTEGER, allowNull: false }, // Đúng kiểu đặt tên
-  type: { 
-    type: DataTypes.ENUM("bank_transfer", "paypal", "credit_card"),
-    allowNull: false,
+class CustomerPaymentMethod extends Model {
+  static associate(models) {
+    CustomerPaymentMethod.belongsTo(models.Customer, { foreignKey: 'customer_id' });
+    CustomerPaymentMethod.hasOne(models.CreditCardInfo, { foreignKey: 'payment_method_id' });
+    CustomerPaymentMethod.hasOne(models.PayPalInfo, { foreignKey: 'payment_method_id' });
+    CustomerPaymentMethod.hasOne(models.BankTransferInfo, { foreignKey: 'payment_method_id' });
+    CustomerPaymentMethod.hasMany(models.Orders, { foreignKey: 'payment_method_id' });
+    CustomerPaymentMethod.hasMany(models.Transaction, { foreignKey: 'payment_method_id' });
+  }
+}
+
+CustomerPaymentMethod.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    customer_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Customer',
+        key: 'id',
+      },
+    },
+    method_type: {
+      type: DataTypes.TEXT,
+      validate: {
+        isIn: [['credit_card', 'paypal', 'bank_transfer']],
+      },
+    },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
-  paymentId: { type: DataTypes.INTEGER, allowNull: false }, 
-});
-
-
+  {
+    sequelize,
+    modelName: 'CustomerPaymentMethod',
+    tableName: 'CustomerPaymentMethod',
+    timestamps: false,
+  }
+);
 
 export default CustomerPaymentMethod;

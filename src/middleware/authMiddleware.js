@@ -2,11 +2,17 @@ import jwt from "jsonwebtoken";
 
 
 const adminMiddleware = (req, res, next) => {
-  if (req.employee.role !== "admin" && req.employee.role !== "superadmin") {
+  if (!req.employee) {
+    return res.status(401).json({ message: "Chưa xác thực người dùng!" });
+  }
+  const role = req.employee.role;
+  if (role !== "Admin" && role !== "Manager") {
     return res.status(403).json({ message: "Bạn không có quyền truy cập!" });
   }
+
   next();
 };
+
 const authMiddleware = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
 
@@ -17,12 +23,13 @@ const authMiddleware = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.employee = decoded;
+
+    
     next();
   } catch (error) {
     res.status(401).json({ message: "Token không hợp lệ!" });
   }
 };
-
 
 
 const Middleware = {

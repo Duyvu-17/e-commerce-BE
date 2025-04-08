@@ -1,6 +1,7 @@
-import Order from "../../models/Order.js";
+
 import OrderItem from "../../models/OrderItem.js";
 import Customer from "../../models/Customer.js";
+import Orders from "../../models/Orders.js";
 
 
 const getOrders = async (req, res) => {
@@ -73,7 +74,7 @@ const updateOrderStatus = async (req, res) => {
 const deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const order = await Order.findByPk(id);
+    const order = await Orders.findByPk(id);
 
     if (!order) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });

@@ -1,35 +1,76 @@
-import { DataTypes } from "sequelize";
+// models/ProductItem.js
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
-import Product from "./Product.js";
 
-const ProductItem = sequelize.define("ProductItem", {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  productId: { 
-    type: DataTypes.INTEGER, 
-    allowNull: false, 
-    references: { model: Product, key: "id" }, 
-    onDelete: "CASCADE" 
+class ProductItem extends Model {
+  static associate(models) {
+    ProductItem.belongsTo(models.Product, { foreignKey: 'product_id' });
+    ProductItem.hasMany(models.ProductImage, { foreignKey: 'product_item_id' });
+    ProductItem.hasMany(models.CartItem, { foreignKey: 'product_item_id' });
+    ProductItem.hasMany(models.OrderItem, { foreignKey: 'product_item_id' });
+    ProductItem.hasOne(models.Inventory, { foreignKey: 'product_item_id' });
+  }
+}
+
+ProductItem.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    product_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Product',
+        key: 'id',
+      },
+    },
+    sku: {
+      type: DataTypes.STRING(255),
+      unique: true,
+    },
+    weight: {
+      type: DataTypes.INTEGER,
+    },
+    dimensions: {
+      type: DataTypes.STRING(255),
+    },
+    attributes: {
+      type: DataTypes.TEXT,
+    },
+    status: {
+      type: DataTypes.STRING(255),
+      validate: {
+        isIn: [['active', 'inactive', 'out_of_stock']],
+      },
+      defaultValue: 'active',
+    },
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+    },
+    color: {
+      type: DataTypes.STRING(100),
+    },
+    size: {
+      type: DataTypes.STRING(100),
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
-  sku: { type: DataTypes.STRING, allowNull: false, unique: true },
-  price: { type: DataTypes.DECIMAL(10,2), allowNull: false },
-  discountPrice: { type: DataTypes.DECIMAL(10,2), allowNull: true }, 
-  qty: { type: DataTypes.INTEGER, allowNull: false }, 
-  weight: { type: DataTypes.FLOAT, allowNull: true }, 
-  dimensions: { type: DataTypes.JSON, allowNull: true }, 
-  attributes: { type: DataTypes.JSON, allowNull: true }, 
-  status: { type: DataTypes.ENUM("active", "inactive", "out_of_stock"), defaultValue: "active" },
-  createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-  updatedAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-});
-
-ProductItem.afterSave(async (productItem, options) => {
-  const totalStock = await ProductItem.sum("qty", { where: { productId: productItem.productId } });
-  await Product.update({ totalStock }, { where: { id: productItem.productId } });
-});
-
-ProductItem.afterDestroy(async (productItem, options) => {
-  const totalStock = await ProductItem.sum("qty", { where: { productId: productItem.productId } });
-  await Product.update({ totalStock }, { where: { id: productItem.productId } });
-});
+  {
+    sequelize,
+    modelName: 'ProductItem',
+    tableName: 'ProductItem',
+    timestamps: false,
+  }
+);
 
 export default ProductItem;

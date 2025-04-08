@@ -1,59 +1,57 @@
-import { DataTypes } from "sequelize";
+// models/Review.js
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
-import Customer from "./Customer.js";
-import Product from "./Product.js";
 
-const Review = sequelize.define("Review", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  customerId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Customer,
-      key: "id",
+class Review extends Model {
+  static associate(models) {
+    Review.belongsTo(models.Customer, { foreignKey: 'customer_id' });
+    Review.belongsTo(models.Product, { foreignKey: 'product_id' });
+    Review.hasMany(models.ReviewImage, { foreignKey: 'review_id' });
+  }
+}
+
+Review.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    onDelete: "CASCADE",
-  },
-  productId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Product,
-      key: "id",
+    customer_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Customer',
+        key: 'id',
+      },
     },
-    onDelete: "CASCADE",
-  },
-  rating: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      min: 1,
-      max: 5,
+    product_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Product',
+        key: 'id',
+      },
+    },
+    rating: {
+      type: DataTypes.INTEGER,
+      validate: {
+        min: 1,
+        max: 5,
+      },
+    },
+    comment: {
+      type: DataTypes.TEXT,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
     },
   },
-  comment: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-}, {
-  indexes: [
-    {
-      unique: true,
-      fields: ["customerId", "productId"], 
-    },
-  ],
-});
+  {
+    sequelize,
+    modelName: 'Review',
+    tableName: 'Review',
+    timestamps: false,
+  }
+);
 
 export default Review;

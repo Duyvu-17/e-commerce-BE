@@ -1,37 +1,35 @@
-// models/Settings.js
+// models/BlogCategory.js
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
 
-class Settings extends Model {
+class BlogCategory extends Model {
   static associate(models) {
-    // Không có mối quan hệ
+    // Thiết lập mối quan hệ Nhiều-Nhiều giữa BlogCategory và Blog thông qua bảng BlogCategoryRelation
+    BlogCategory.belongsToMany(models.Blog, { 
+      through: models.BlogCategoryRelation, 
+      foreignKey: 'category_id' 
+    });
   }
 }
 
-Settings.init(
+BlogCategory.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    setting_key: {
+    name: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    slug: {
       type: DataTypes.STRING(255),
       unique: true,
       allowNull: false,
     },
-    setting_value: {
-      type: DataTypes.TEXT,
-    },
-    setting_group: {
-      type: DataTypes.STRING(255),
-    },
     description: {
       type: DataTypes.TEXT,
-    },
-    is_public: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
     },
     created_at: {
       type: DataTypes.DATE,
@@ -44,10 +42,10 @@ Settings.init(
   },
   {
     sequelize,
-    modelName: "Settings",
-    tableName: "Settings",
+    modelName: "BlogCategory",
+    tableName: "BlogCategory",
     timestamps: false,
   }
 );
 
-export default Settings;
+export default BlogCategory;

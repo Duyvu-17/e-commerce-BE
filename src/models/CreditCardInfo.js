@@ -1,13 +1,46 @@
-import  DataTypes  from "sequelize";
+// models/CreditCardInfo.js
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
 
+class CreditCardInfo extends Model {
+  static associate(models) {
+    CreditCardInfo.belongsTo(models.CustomerPaymentMethod, { foreignKey: 'payment_method_id' });
+  }
+}
 
-const CreditCardInfo = sequelize.define("CreditCardInfo", {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  cardholderName: { type: DataTypes.STRING, allowNull: false },
-  encrypt_card_number: { type: DataTypes.STRING, allowNull: false },  
-  expiryDate: { type: DataTypes.STRING, allowNull: false },
-  cvv: { type: DataTypes.STRING, allowNull: false },
-});
+CreditCardInfo.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    payment_method_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'CustomerPaymentMethod',
+        key: 'id',
+      },
+    },
+    card_number: {
+      type: DataTypes.STRING(20),
+    },
+    expiry_date: {
+      type: DataTypes.DATE,
+    },
+    cvv: {
+      type: DataTypes.STRING(10),
+    },
+    cardholder_name: {
+      type: DataTypes.STRING(255),
+    },
+  },
+  {
+    sequelize,
+    modelName: 'CreditCardInfo',
+    tableName: 'CreditCardInfo',
+    timestamps: false,
+  }
+);
 
 export default CreditCardInfo;

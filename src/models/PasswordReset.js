@@ -27,7 +27,7 @@ const PasswordReset = sequelize.define("PasswordReset", {
     defaultValue: 'password_reset'
   },
   ipAddress: {
-    type: DataTypes.STRING(45), // IPv6 support
+    type: DataTypes.STRING(45), 
     allowNull: true
   },
   userAgent: {
