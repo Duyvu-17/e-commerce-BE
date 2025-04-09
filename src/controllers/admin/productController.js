@@ -43,11 +43,9 @@ const getProducts = async (req, res) => {
       }
 
       // Tính số lượng Variants (tương ứng với số lượng ProductItem)
-      const variants = productData.ProductItems ? productData.ProductItems.length : 0;
 
       // Thêm số lượng tồn kho và số lượng biến thể vào dữ liệu sản phẩm
       productData.inventory = inventory;
-      productData.variants = variants; 
 
       return productData;
     });
