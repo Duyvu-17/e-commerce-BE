@@ -1,19 +1,14 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import Employee from "../../models/Employee.js";
-// import Role from './../../models/Role';
+import Role from "../../models/Role.js"
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
 
-// const getRoleNameFromId = async (role_id) => {
-//   const role = await Role.findOne({ where: { id: role_id } });
-//   return role?.name; // ví dụ: "Admin"
-// };
+
 // Hàm tạo access token
 const generateToken = (employee) => {
-  console.log(employee);
-  
   return jwt.sign(
-    { id: employee.id, email: employee.email, role: employee.name },
+    { id: employee.id, email: employee.email, role: employee.id },
     process.env.JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN }
   );
@@ -29,41 +24,33 @@ const generateRefreshToken = (employee) => {
 };
 
 const register = async (req, res) => {
-  console.log(req.body); // Để kiểm tra dữ liệu trong request
   try {
     const { fullName, email, password, role } = req.body;
-
     // Kiểm tra thông tin yêu cầu
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "Vui lòng nhập đầy đủ họ tên, email và mật khẩu!" });
     }
-
     // Kiểm tra định dạng email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Email không hợp lệ!" });
     }
-
     // Kiểm tra mật khẩu
     if (password.length < 6) {
       return res.status(400).json({ message: "Mật khẩu phải có ít nhất 6 ký tự!" });
     }
-
     // Kiểm tra vai trò
     const validRoles = ["admin", "super-admin"];
     if (role && !validRoles.includes(role)) {
       return res.status(400).json({ message: "Vai trò không hợp lệ!" });
     }
-
     // Kiểm tra email đã tồn tại
     const existingEmployee = await Employee.findOne({ where: { email } });
     if (existingEmployee) {
       return res.status(400).json({ message: "Email đã tồn tại!" });
     }
-
     // Mã hóa mật khẩu
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // Tạo mới nhân viên
     const newEmployee = await Employee.create({
       fullName,
@@ -90,52 +77,58 @@ const register = async (req, res) => {
 
 
 const login = async (req, res) => {
-  console.log(req.body);
   try {
     const { email, password } = req.body;
-    console.log(password);
-
     // Kiểm tra xem email và mật khẩu có được nhập không
     if (!email || !password) {
       return res.status(400).json({ message: "Vui lòng nhập email và mật khẩu!" });
     }
-
     // Kiểm tra định dạng email hợp lệ
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Email không hợp lệ!" });
     }
-
-    // Tìm kiếm người dùng trong cơ sở dữ liệu
-    const employee = await Employee.findOne({ where: { email }, raw: true });
-
+    
+    // Tìm kiếm người dùng không kèm role
+    const employee = await Employee.findOne({ where: { email } });
+    
     // Kiểm tra nếu không tìm thấy người dùng
     if (!employee) {
       return res.status(404).json({ message: "Tài khoản không tồn tại!" });
     }
-
-    console.log(employee.password);  // Kiểm tra password nếu employee không phải null
-
     // Kiểm tra nếu tài khoản bị vô hiệu hóa
     if (employee.status !== "active") {
       return res.status(403).json({ message: "Tài khoản của bạn đã bị vô hiệu hóa!" });
     }
-
     // Kiểm tra mật khẩu
     const isMatch = await bcrypt.compare(password, employee.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Mật khẩu không chính xác!" });
     }
-
+    
     // Tạo token và refresh token cho người dùng
-    const token = generateToken(employee);
-    const refreshToken = generateRefreshToken(employee);
+    const token = await generateToken(employee);
+    const refreshToken = await generateRefreshToken(employee);
 
-    // Lưu refresh token vào cơ sở dữ liệu (có thể thêm bảng RefreshToken hoặc thêm cột vào Employee)
+    // Lưu refresh token vào cơ sở dữ liệu
     await Employee.update(
       { refreshToken: refreshToken },
       { where: { id: employee.id } }
     );
+
+    // Lấy thông tin role trong truy vấn riêng
+    let roleInfo = { id: employee.role_id };
+    
+    if (employee.role_id) {
+      const role = await Role.findByPk(employee.role_id);
+      if (role) {
+        roleInfo = {
+          id: role.id,
+          name: role.name,
+          permissions: role.permissions 
+        };
+      }
+    }
 
     res.json({
       message: "Đăng nhập thành công!",
@@ -145,7 +138,7 @@ const login = async (req, res) => {
         id: employee.id,
         name: employee.full_name,
         email: employee.email,
-        role: employee.role,
+        role: roleInfo,
         avatar: employee.avatar
       },
     });

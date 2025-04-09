@@ -11,11 +11,11 @@ async function createRoles() {
   if (roles.length === 0) {
     // Tạo các vai trò nếu chưa có
     await Role.bulkCreate([
-      { name: "Admin", tasks: "Quản lý hệ thống, Quản lý nhân viên" },
-      { name: "Manager", tasks: "Giám sát, Quản lý các phòng ban, Xử lý báo cáo" },
-      { name: "Employee", tasks: "Thực hiện công việc hàng ngày, Quản lý đơn hàng" },
-      { name: "Support", tasks: "Hỗ trợ khách hàng, Giải quyết khiếu nại" },
-      { name: "HR", tasks: "Quản lý nhân sự, Tuyển dụng, Đào tạo nhân viên" },
+      { name: "Admin", permissions: "Quản lý hệ thống, Quản lý nhân viên" },
+      { name: "Manager", permissions: "Giám sát, Quản lý các phòng ban, Xử lý báo cáo" },
+      { name: "Employee", permissions: "Thực hiện công việc hàng ngày, Quản lý đơn hàng" },
+      { name: "Support", permissions: "Hỗ trợ khách hàng, Giải quyết khiếu nại" },
+      { name: "HR", permissions: "Quản lý nhân sự, Tuyển dụng, Đào tạo nhân viên" },
     ]);
     console.log("Roles đã được tạo.");
   }

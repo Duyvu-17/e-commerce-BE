@@ -6,10 +6,9 @@ const adminMiddleware = (req, res, next) => {
     return res.status(401).json({ message: "Chưa xác thực người dùng!" });
   }
   const role = req.employee.role;
-  if (role !== "Admin" && role !== "Manager") {
+  if (role !== 1 && role !== 2 && role !== 3) {
     return res.status(403).json({ message: "Bạn không có quyền truy cập!" });
   }
-
   next();
 };
 

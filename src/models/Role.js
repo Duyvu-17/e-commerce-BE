@@ -19,7 +19,7 @@ Role.init(
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    tasks: {
+    permissions: {
       type: DataTypes.TEXT,
       allowNull: true,  // Có thể là null nếu không có công việc cụ thể
     },

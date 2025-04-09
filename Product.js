@@ -30,6 +30,8 @@ async function seedProducts() {
         summary: 'iPhone với thiết kế titan mới, chip A17 Pro mạnh mẽ.',
         slug: 'iphone-15-pro-max',
         cover_image: 'https://example.com/images/iphone15.jpg',
+        price: 1299.00,
+        category_id: category.id,
         items: [
           {
             sku: 'IPH15PM-BLACK-128GB',
@@ -53,6 +55,7 @@ async function seedProducts() {
         summary: 'Màn hình lớn, camera 200MP, pin lâu.',
         slug: 'samsung-galaxy-s23-ultra',
         cover_image: 'https://example.com/images/s23-ultra.jpg',
+        price: 1299.00,
         items: [
           {
             sku: 'SGS23U-BLACK-256GB',
@@ -76,6 +79,7 @@ async function seedProducts() {
         summary: 'Camera AI mạnh mẽ, hiệu suất tuyệt vời.',
         slug: 'google-pixel-7-pro',
         cover_image: 'https://example.com/images/pixel7pro.jpg',
+        price: 1299.00,
         items: [
           {
             sku: 'GP7P-BLUE-128GB',
@@ -99,6 +103,7 @@ async function seedProducts() {
         summary: 'Thiết kế đẹp, hiệu năng mạnh mẽ.',
         slug: 'oneplus-11',
         cover_image: 'https://example.com/images/oneplus11.jpg',
+        price: 1299.00,
         items: [
           {
             sku: 'OP11-GREEN-128GB',
@@ -122,6 +127,7 @@ async function seedProducts() {
         summary: 'Camera Leica, hiệu suất mạnh mẽ.',
         slug: 'xiaomi-13-pro',
         cover_image: 'https://example.com/images/xiaomi13pro.jpg',
+        price: 1299.00,
         items: [
           {
             sku: 'XM13P-WHITE-256GB',

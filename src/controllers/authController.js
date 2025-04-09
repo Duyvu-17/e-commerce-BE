@@ -243,7 +243,6 @@ const customerForgotPassword = async (req, res) => {
 
     const resetLink = `${CLIENT_URL}/reset-password?token=${resetToken}`;
     const { html, text } = generateResetPasswordEmail(customer, resetLink);
-    console.log(resetToken);
 
     // Send reset password email
     await transporter.sendMail({

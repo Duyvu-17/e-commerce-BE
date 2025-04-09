@@ -37,6 +37,9 @@ Product.init(
     cover_image: {
       type: DataTypes.STRING(255),
     },
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+    },
     status: {
       type: DataTypes.STRING(255),
       validate: {
@@ -64,7 +67,8 @@ Product.init(
     sequelize,
     modelName: 'Product',
     tableName: 'Product',
-    timestamps: false,
+    timestamps: false, 
+    underscored: true, 
   }
 );
 
