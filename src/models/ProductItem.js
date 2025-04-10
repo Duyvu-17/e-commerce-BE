@@ -27,6 +27,10 @@ ProductItem.init(
         key: 'id',
       },
     },
+    name: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
     sku: {
       type: DataTypes.STRING(255),
       unique: true,
@@ -38,8 +42,14 @@ ProductItem.init(
       type: DataTypes.STRING(255),
     },
     attributes: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON,
+      allowNull: true,
     },
+    barcode: {
+      type: DataTypes.STRING(255), 
+      unique: true, 
+    },
+
     status: {
       type: DataTypes.STRING(255),
       validate: {

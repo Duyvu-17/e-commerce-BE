@@ -2,11 +2,14 @@ import Product from "../../models/Product.js";
 import ProductItem from "../../models/ProductItem.js";
 import ProductImage from "../../models/ProductImage.js";
 import Inventory from "../../models/Inventory.js";
+import Category from "../../models/Category.js";
+import Discount from "../../models/Discount.js";
+import DiscountProduct from "../../models/DiscountProduct.js";
 
 const getProducts = async (req, res) => {
   try {
     const products = await Product.findAll({
-      attributes: ["id", "name", "description", "price", "created_at", "updated_at"],
+      attributes: ["id", "name", "description", "image" ,"price", "createdAt", "updatedAt"],
       include: [
         {
           model: ProductItem,
@@ -14,7 +17,7 @@ const getProducts = async (req, res) => {
           include: [
             {
               model: Inventory,
-              attributes: ["quantity"],  // Lấy số lượng tồn kho từ bảng Inventory
+              attributes: ["quantity"],  
             },
           ],
         },
@@ -23,8 +26,13 @@ const getProducts = async (req, res) => {
           as: 'category',
           attributes: ["id", "name"],
         },
+        {
+          model: Discount,
+          through: DiscountProduct,
+          attributes: ["id", "code", "discount_type", "discount_value", "start_date", "end_date"],
+        }
       ],
-      order: [["created_at", "DESC"]],
+      order: [["createdAt", "DESC"]],
     });
 
     // Format lại dữ liệu để thêm số lượng tồn kho và số lượng biến thể vào mỗi sản phẩm
@@ -42,10 +50,39 @@ const getProducts = async (req, res) => {
         });
       }
 
-      // Tính số lượng Variants (tương ứng với số lượng ProductItem)
-
-      // Thêm số lượng tồn kho và số lượng biến thể vào dữ liệu sản phẩm
+      // Thêm số lượng tồn kho vào dữ liệu sản phẩm
       productData.inventory = inventory;
+
+      // Tính giá sau khi áp dụng giảm giá
+      const originalPrice = parseFloat(productData.price);
+      let salePrice = null; // Khởi tạo salePrice là null nếu không có giảm giá
+
+      // Kiểm tra xem sản phẩm có mã giảm giá hợp lệ không
+      const currentDate = new Date();
+      const activeDiscounts = productData.Discounts?.filter(discount => 
+        new Date(discount.start_date) <= currentDate && 
+        new Date(discount.end_date) >= currentDate
+      ) || [];
+
+      if (activeDiscounts.length > 0) {
+        // Áp dụng mã giảm giá đầu tiên tìm thấy (hoặc có thể áp dụng mã giảm giá có giá trị cao nhất)
+        const discount = activeDiscounts[0];
+        const discountValue = parseFloat(discount.discount_value);
+        
+        if (discount.discount_type === 'percentage') {
+          // Giảm giá theo phần trăm
+          salePrice = originalPrice - (originalPrice * (discountValue / 100));
+        } else if (discount.discount_type === 'fixed') {
+          // Giảm giá cố định
+          salePrice = Math.max(0, originalPrice - discountValue);
+        }
+        
+        // Làm tròn giá đến 2 chữ số thập phân
+        salePrice = Math.round(salePrice * 100) / 100;
+      }
+
+      // Thêm giá sau khi giảm vào dữ liệu sản phẩm
+      productData.salePrice = salePrice;
 
       return productData;
     });
@@ -58,43 +95,70 @@ const getProducts = async (req, res) => {
 };
 
 
-
-// Đừng quên import Op từ Sequelize
-import Category from "../../models/Category.js";
-
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
     const product = await Product.findByPk(id, {
       attributes: [
-        'id', 
-        'name', 
-        'description', 
-        'summary', 
-        'slug', 
-        'cover_image', 
-        'status', 
-        'category_id', 
-        'created_at', 
-        'updated_at'
+        "id",
+        "name",
+        "description",
+        "summary",
+        "slug",
+        "image",
+        "status",
+        "price",
+        "sku",
+        "barcode",
+        "createdAt",
+        "updatedAt",
       ],
       include: [
         {
           model: ProductItem,
-          attributes: ['id', 'sku', 'price', 'weight', 'dimensions', 'attributes', 'status', 'color', 'size'],
+          attributes: [
+            "id",
+            "sku",
+            "price",
+            "weight",
+            "dimensions",
+            "attributes",
+            "status",
+            "color",
+            "size",
+            "name",
+            "barcode",
+          ],
           include: [
             {
               model: ProductImage,
-              attributes: ['id', 'image_url', 'is_primary']
-            }
-          ]
+              attributes: ["id", "image_url", "is_primary"],
+            },
+          ],
         },
         {
           model: ProductImage,
-          attributes: ['id', 'image_url', 'is_primary'],
+          attributes: ["id", "image_url", "is_primary"],
           where: { product_item_id: null },
-          required: false
-        }
+          required: false,
+        },
+        {
+          model: Category,
+          as: "category",
+          attributes: ["id", "name"],
+        },
+        {
+          model: Discount,
+          through: DiscountProduct,
+          attributes: [
+            "id",
+            "code",
+            "discount_type",
+            "discount_value",
+            "start_date",
+            "end_date",
+          ],
+        },
       ],
     });
 
@@ -110,16 +174,47 @@ const getProductById = async (req, res) => {
     
     // Tìm ảnh cover chính
     const primaryImage = product.ProductImages?.find(img => img.is_primary) || product.ProductImages?.[0];
-    if (primaryImage && !productData.cover_image) {
-      productData.cover_image = primaryImage.image_url;
+    if (primaryImage && !productData.image) {
+      productData.image = primaryImage.image_url;
     }
     
     // Thêm thông tin giá
     if (productData.ProductItems && productData.ProductItems.length > 0) {
-      const prices = productData.ProductItems.map(item => Number(item.price));
+      const prices = productData.ProductItems.map(item => parseFloat(item.price));
       productData.min_price = Math.min(...prices);
       productData.max_price = Math.max(...prices);
     }
+
+    // Tính giá sau khi áp dụng giảm giá
+    const originalPrice = parseFloat(productData.price);
+    let salePrice = originalPrice;
+
+    // Kiểm tra xem sản phẩm có mã giảm giá hợp lệ không
+    const currentDate = new Date();
+    const activeDiscounts = productData.Discounts?.filter(discount => 
+      new Date(discount.start_date) <= currentDate && 
+      new Date(discount.end_date) >= currentDate
+    ) || [];
+
+    if (activeDiscounts.length > 0) {
+      // Áp dụng mã giảm giá đầu tiên tìm thấy (hoặc có thể áp dụng mã giảm giá có giá trị cao nhất)
+      const discount = activeDiscounts[0];
+      const discountValue = parseFloat(discount.discount_value);
+      
+      if (discount.discount_type === 'percentage') {
+        // Giảm giá theo phần trăm
+        salePrice = originalPrice - (originalPrice * (discountValue / 100));
+      } else if (discount.discount_type === 'fixed') {
+        // Giảm giá cố định
+        salePrice = Math.max(0, originalPrice - discountValue);
+      }
+      
+      // Làm tròn giá đến 2 chữ số thập phân
+      salePrice = Math.round(salePrice * 100) / 100;
+    }
+
+    // Thêm giá sau khi giảm vào dữ liệu sản phẩm
+    productData.salePrice = salePrice;
 
     res.status(200).json({
       success: true,
@@ -136,14 +231,14 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const { name, description, summary, slug, cover_image, status, category_id, product_items } = req.body;
+    const { name, description, summary, slug, image, status, category_id, product_items } = req.body;
 
     const newProduct = await Product.create({ 
       name, 
       description, 
       summary, 
       slug, 
-      cover_image, 
+      image, 
       status, 
       category_id 
     });
@@ -184,7 +279,7 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, summary, slug, cover_image, status, category_id } = req.body;
+    const { name, description, summary, slug, image, status, category_id } = req.body;
 
     const product = await Product.findByPk(id);
     if (!product) {
@@ -199,7 +294,7 @@ const updateProduct = async (req, res) => {
       description, 
       summary, 
       slug, 
-      cover_image, 
+      image, 
       status, 
       category_id 
     });

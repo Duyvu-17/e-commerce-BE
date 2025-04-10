@@ -1,4 +1,3 @@
-// seedProducts.js
 import Category from "./src/models/Category.js";
 import Product from "./src/models/Product.js";
 import ProductItem from "./src/models/ProductItem.js";
@@ -14,9 +13,9 @@ async function seedProducts() {
     let category = await Category.findOne();
     if (!category) {
       category = await Category.create({
-        name: 'Điện tử',
-        description: 'Thiết bị điện tử hiện đại',
-        image: 'https://example.com/images/dien-tu.jpg',
+        name: 'Thời trang',
+        description: 'Sản phẩm thời trang chất lượng cao',
+        image: 'https://example.com/images/thoi-trang.jpg',
         created_at: new Date(),
         updated_at: new Date(),
       });
@@ -25,124 +24,154 @@ async function seedProducts() {
     // Danh sách sản phẩm mới
     const productsData = [
       {
-        name: 'iPhone 15 Pro Max',
-        description: 'Điện thoại cao cấp của Apple',
-        summary: 'iPhone với thiết kế titan mới, chip A17 Pro mạnh mẽ.',
-        slug: 'iphone-15-pro-max',
-        cover_image: 'https://example.com/images/iphone15.jpg',
-        price: 1299.00,
+        name: 'Áo Thun Cotton Classic',
+        description: 'Áo thun cotton thoáng mát và thoải mái cho mọi hoạt động hàng ngày. Được làm từ chất liệu vải cotton cao cấp, mềm mại và dễ chịu trên da. Thiết kế cổ tròn cổ điển và tay ngắn tạo nên vẻ ngoài đơn giản nhưng không kém phần thanh lịch, dễ dàng kết hợp với nhiều trang phục khác.',
+        summary: 'Áo thun cotton cao cấp với thiết kế cổ điển.',
+        slug: 'ao-thun-cotton-classic',
+        image: 'https://example.com/images/ao-thun-main.jpg',
+        price: 299000,
         category_id: category.id,
         items: [
           {
-            sku: 'IPH15PM-BLACK-128GB',
-            price: 1099.00,
-            color: 'Đen',
-            size: '128GB',
-            attributes: { chip: 'A17 Pro', camera: '48MP' },
-          },
-          {
-            sku: 'IPH15PM-BLACK-256GB',
-            price: 1199.00,
-            color: 'Đen',
-            size: '256GB',
-            attributes: { chip: 'A17 Pro', camera: '48MP' },
-          },
-        ],
-      },
-      {
-        name: 'Samsung Galaxy S23 Ultra',
-        description: 'Điện thoại flagship của Samsung',
-        summary: 'Màn hình lớn, camera 200MP, pin lâu.',
-        slug: 'samsung-galaxy-s23-ultra',
-        cover_image: 'https://example.com/images/s23-ultra.jpg',
-        price: 1299.00,
-        items: [
-          {
-            sku: 'SGS23U-BLACK-256GB',
-            price: 1199.00,
-            color: 'Đen',
-            size: '256GB',
-            attributes: { chip: 'Snapdragon 8 Gen 2', camera: '200MP' },
-          },
-          {
-            sku: 'SGS23U-BLACK-512GB',
-            price: 1399.00,
-            color: 'Đen',
-            size: '512GB',
-            attributes: { chip: 'Snapdragon 8 Gen 2', camera: '200MP' },
-          },
-        ],
-      },
-      {
-        name: 'Google Pixel 7 Pro',
-        description: 'Điện thoại thông minh của Google',
-        summary: 'Camera AI mạnh mẽ, hiệu suất tuyệt vời.',
-        slug: 'google-pixel-7-pro',
-        cover_image: 'https://example.com/images/pixel7pro.jpg',
-        price: 1299.00,
-        items: [
-          {
-            sku: 'GP7P-BLUE-128GB',
-            price: 899.00,
-            color: 'Xanh',
-            size: '128GB',
-            attributes: { chip: 'Google Tensor G2', camera: '50MP' },
-          },
-          {
-            sku: 'GP7P-BLUE-256GB',
-            price: 999.00,
-            color: 'Xanh',
-            size: '256GB',
-            attributes: { chip: 'Google Tensor G2', camera: '50MP' },
-          },
-        ],
-      },
-      {
-        name: 'OnePlus 11',
-        description: 'Điện thoại cao cấp của OnePlus',
-        summary: 'Thiết kế đẹp, hiệu năng mạnh mẽ.',
-        slug: 'oneplus-11',
-        cover_image: 'https://example.com/images/oneplus11.jpg',
-        price: 1299.00,
-        items: [
-          {
-            sku: 'OP11-GREEN-128GB',
-            price: 749.00,
-            color: 'Xanh lá',
-            size: '128GB',
-            attributes: { chip: 'Snapdragon 8 Gen 2', camera: '50MP' },
-          },
-          {
-            sku: 'OP11-GREEN-256GB',
-            price: 849.00,
-            color: 'Xanh lá',
-            size: '256GB',
-            attributes: { chip: 'Snapdragon 8 Gen 2', camera: '50MP' },
-          },
-        ],
-      },
-      {
-        name: 'Xiaomi 13 Pro',
-        description: 'Điện thoại cao cấp của Xiaomi',
-        summary: 'Camera Leica, hiệu suất mạnh mẽ.',
-        slug: 'xiaomi-13-pro',
-        cover_image: 'https://example.com/images/xiaomi13pro.jpg',
-        price: 1299.00,
-        items: [
-          {
-            sku: 'XM13P-WHITE-256GB',
-            price: 999.00,
+            name: 'Áo Thun Cotton Classic - Trắng size S',
+            sku: 'AT-CLASSIC-TR-S',
+            price: 299000,
             color: 'Trắng',
-            size: '256GB',
-            attributes: { chip: 'Snapdragon 8 Gen 2', camera: '50MP' },
+            size: 'S',
+            attributes: { material: '100% Cotton', care: 'Giặt máy với nước lạnh' }
           },
           {
-            sku: 'XM13P-WHITE-512GB',
-            price: 1099.00,
+            name: 'Áo Thun Cotton Classic - Trắng size M',
+            sku: 'AT-CLASSIC-TR-M',
+            price: 299000,
             color: 'Trắng',
-            size: '512GB',
-            attributes: { chip: 'Snapdragon 8 Gen 2', camera: '50MP' },
+            size: 'M',
+            attributes: { material: '100% Cotton', care: 'Giặt máy với nước lạnh' }
           },
+          {
+            name: 'Áo Thun Cotton Classic - Đen size S',
+            sku: 'AT-CLASSIC-DE-S',
+            price: 299000,
+            color: 'Đen',
+            size: 'S',
+            attributes: { material: '100% Cotton', care: 'Giặt máy với nước lạnh' }
+          }
+        ],
+      },
+      {
+        name: 'Quần Jeans Slim Fit',
+        description: 'Quần jeans ôm dáng hiện đại, được làm từ chất liệu denim cao cấp. Thiết kế vừa vặn hoàn hảo, tôn lên dáng người mặc với sự thoải mái vừa đủ. Chất liệu bền bỉ, co giãn nhẹ giúp duy trì form dáng qua nhiều lần sử dụng.',
+        summary: 'Quần jeans ôm dáng với độ co giãn thoải mái.',
+        slug: 'quan-jeans-slim-fit',
+        image: 'https://example.com/images/jeans-main.jpg',
+        price: 599000,
+        category_id: category.id,
+        items: [
+          {
+            name: 'Quần Jeans Slim Fit - Xanh size 30',
+            sku: 'QJ-SLIM-XA-30',
+            price: 599000,
+            color: 'Xanh',
+            size: '30',
+            attributes: { material: '98% Cotton, 2% Spandex', care: 'Giặt máy với nước lạnh, sấy khô ở nhiệt độ thấp' }
+          },
+          {
+            name: 'Quần Jeans Slim Fit - Xanh size 32',
+            sku: 'QJ-SLIM-XA-32',
+            price: 599000,
+            color: 'Xanh',
+            size: '32',
+            attributes: { material: '98% Cotton, 2% Spandex', care: 'Giặt máy với nước lạnh, sấy khô ở nhiệt độ thấp' }
+          }
+        ],
+      },
+      {
+        name: 'Túi Đeo Chéo Da',
+        description: 'Túi đeo chéo thanh lịch làm từ da thật cao cấp. Phụ kiện thời trang này có nhiều ngăn tiện lợi, dây đeo điều chỉnh được và các chi tiết kim loại màu vàng sang trọng. Sử dụng được trong cả trang phục thường ngày và dự tiệc.',
+        summary: 'Túi đeo chéo da thật với nhiều ngăn tiện dụng.',
+        slug: 'tui-deo-cheo-da',
+        image: 'https://example.com/images/tui-main.jpg',
+        price: 899000,
+        category_id: category.id,
+        items: [
+          {
+            name: 'Túi Đeo Chéo Da - Nâu',
+            sku: 'TD-CHEO-NA',
+            price: 899000,
+            color: 'Nâu',
+            size: 'Tiêu chuẩn',
+            attributes: { material: 'Da thật 100%', care: 'Lau bằng khăn ẩm' }
+          },
+          {
+            name: 'Túi Đeo Chéo Da - Đen',
+            sku: 'TD-CHEO-DE',
+            price: 899000,
+            color: 'Đen',
+            size: 'Tiêu chuẩn',
+            attributes: { material: 'Da thật 100%', care: 'Lau bằng khăn ẩm' }
+          }
+        ],
+      },
+      {
+        name: 'Tai Nghe Bluetooth Không Dây',
+        description: 'Tai nghe hiệu suất cao với công nghệ Bluetooth 5.0. Trải nghiệm chất lượng âm thanh sống động, tính năng chống ồn chủ động và thời lượng pin lên đến 30 giờ. Thiết kế công thái học đảm bảo sự thoải mái khi sử dụng lâu.',
+        summary: 'Tai nghe không dây cao cấp với tính năng chống ồn.',
+        slug: 'tai-nghe-bluetooth-khong-day',
+        image: 'https://example.com/images/tai-nghe-main.jpg',
+        price: 1299000,
+        category_id: category.id,
+        items: [
+          {
+            name: 'Tai Nghe Bluetooth Không Dây - Đen',
+            sku: 'TN-BT-DE',
+            price: 1299000,
+            color: 'Đen',
+            size: 'Tiêu chuẩn',
+            attributes: { connectivity: 'Bluetooth 5.0', batteryLife: '30 giờ', features: ['Chống ồn chủ động', 'Sạc nhanh'] }
+          },
+          {
+            name: 'Tai Nghe Bluetooth Không Dây - Trắng',
+            sku: 'TN-BT-TR',
+            price: 1299000,
+            color: 'Trắng',
+            size: 'Tiêu chuẩn',
+            attributes: { connectivity: 'Bluetooth 5.0', batteryLife: '30 giờ', features: ['Chống ồn chủ động', 'Sạc nhanh'] }
+          }
+        ],
+      },
+      {
+        name: 'Đồng Hồ Thông Minh Theo Dõi Sức Khỏe',
+        description: 'Đồng hồ thông minh với tính năng theo dõi nhịp tim, giấc ngủ và GPS. Màn hình cảm ứng sống động cho phép truy cập dễ dàng vào dữ liệu luyện tập, thông báo và ứng dụng. Thiết kế chống nước phù hợp cho bơi lội và các hoạt động ngoài trời.',
+        summary: 'Đồng hồ thông minh đa chức năng với theo dõi nhịp tim.',
+        slug: 'dong-ho-thong-minh-theo-doi-suc-khoe',
+        image: 'https://example.com/images/dong-ho-main.jpg',
+        price: 1499000,
+        category_id: category.id,
+        items: [
+          {
+            name: 'Đồng Hồ Thông Minh Theo Dõi Sức Khỏe - Đen',
+            sku: 'DH-TM-DE',
+            price: 1499000,
+            color: 'Đen',
+            size: 'Tiêu chuẩn',
+            attributes: { waterResistant: '50m', batteryLife: '7 ngày', features: ['Theo dõi nhịp tim', 'GPS', 'Theo dõi giấc ngủ'] }
+          },
+          {
+            name: 'Đồng Hồ Thông Minh Theo Dõi Sức Khỏe - Xanh',
+            sku: 'DH-TM-XA',
+            price: 1499000,
+            color: 'Xanh',
+            size: 'Tiêu chuẩn',
+            attributes: { waterResistant: '50m', batteryLife: '7 ngày', features: ['Theo dõi nhịp tim', 'GPS', 'Theo dõi giấc ngủ'] }
+          },
+          {
+            name: 'Đồng Hồ Thông Minh Theo Dõi Sức Khỏe - Hồng',
+            sku: 'DH-TM-HO',
+            price: 1499000,
+            color: 'Hồng',
+            size: 'Tiêu chuẩn',
+            attributes: { waterResistant: '50m', batteryLife: '7 ngày', features: ['Theo dõi nhịp tim', 'GPS', 'Theo dõi giấc ngủ'] }
+          }
         ],
       },
     ];
@@ -154,21 +183,27 @@ async function seedProducts() {
         description: productData.description,
         summary: productData.summary,
         slug: productData.slug,
-        cover_image: productData.cover_image,
+        image: productData.image,
+        price: productData.price,
+        sku: `SKU-${productData.slug}`,
+        barcode: `BARCODE-${productData.slug}`,
         status: 'active',
         category_id: category.id,
-        created_at: new Date(),
-        updated_at: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
 
       // Tạo các model (product items) cho sản phẩm
       const productItems = await ProductItem.bulkCreate(
         productData.items.map(item => ({
           product_id: product.id,
+          name: item.name, 
           sku: item.sku,
-          weight: 240,
-          dimensions: '146.6 x 70.6 x 8.3 mm',
+          weight: 250,
+          dimensions: '40x30x5 cm',
           attributes: JSON.stringify(item.attributes),
+          barcode: `BARCODE-${item.sku}`, // Tạo mã vạch từ SKU
+          status: 'active',
           price: item.price,
           color: item.color,
           size: item.size,
@@ -181,14 +216,14 @@ async function seedProducts() {
       await ProductImage.bulkCreate([
         {
           product_id: product.id,
-          image_url: `${productData.cover_image}`,
+          image_url: productData.image,
           is_primary: true,
         },
         ...productItems.map((item, index) => ({
           product_id: product.id,
           product_item_id: item.id,
-          image_url: `https://example.com/images/${productData.slug}-${item.size}.jpg`,
-          is_primary: false,
+          image_url: `https://example.com/images/${productData.slug}-${item.color.toLowerCase()}-${item.size.toLowerCase()}.jpg`,
+          is_primary: index === 0, // Đặt ảnh đầu tiên là primary
         })),
       ]);
     }

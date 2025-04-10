@@ -34,11 +34,19 @@ Product.init(
     slug: {
       type: DataTypes.TEXT,
     },
-    cover_image: {
+    image: {
       type: DataTypes.STRING(255),
     },
     price: {
       type: DataTypes.DECIMAL(10, 2),
+    },
+    sku: {
+      type: DataTypes.STRING(255),
+      unique: true,
+    },
+    barcode: {
+      type: DataTypes.STRING(255), 
+      unique: true, 
     },
     status: {
       type: DataTypes.STRING(255),
@@ -54,11 +62,11 @@ Product.init(
         key: 'id',
       },
     },
-    created_at: {
+    createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
-    updated_at: {
+    updatedAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
