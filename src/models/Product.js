@@ -45,15 +45,19 @@ Product.init(
       unique: true,
     },
     barcode: {
-      type: DataTypes.STRING(255), 
-      unique: true, 
-    },
-    status: {
       type: DataTypes.STRING(255),
-      validate: {
-        isIn: [['active', 'inactive', 'deleted']],
-      },
-      defaultValue: 'active',
+      unique: true,
+    },
+
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
     category_id: {
       type: DataTypes.INTEGER,
@@ -61,6 +65,13 @@ Product.init(
         model: 'Category',
         key: 'id',
       },
+    },
+    status: {
+      type: DataTypes.TEXT,
+      defaultValue: 'In Stock',
+      validate: {
+        isIn: [['out of stock', 'in stock', 'low stock']],
+      }
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -75,8 +86,8 @@ Product.init(
     sequelize,
     modelName: 'Product',
     tableName: 'Product',
-    timestamps: false, 
-    underscored: true, 
+    timestamps: false,
+    underscored: true,
   }
 );
 

@@ -5,11 +5,21 @@ import Inventory from "../../models/Inventory.js";
 import Category from "../../models/Category.js";
 import Discount from "../../models/Discount.js";
 import DiscountProduct from "../../models/DiscountProduct.js";
+import Settings from "../../models/Settings.js";
 
 const getProducts = async (req, res) => {
   try {
+    // Lấy threshold từ Settings
+    const [lowStockSetting, outOfStockSetting] = await Promise.all([
+      Settings.findOne({ where: { setting_key: "low_stock_threshold" } }),
+      Settings.findOne({ where: { setting_key: "out_of_stock_threshold" } }),
+    ]);
+
+    const lowThreshold = parseInt(lowStockSetting?.setting_value || "20");
+    const outThreshold = parseInt(outOfStockSetting?.setting_value || "5");
+
     const products = await Product.findAll({
-      attributes: ["id", "name", "description", "image" ,"price", "createdAt", "updatedAt"],
+      attributes: ["id", "name", "description", "image", "price", "category_id", "isDeleted", "isActive", "status", "createdAt", "updatedAt"],
       include: [
         {
           model: ProductItem,
@@ -17,14 +27,9 @@ const getProducts = async (req, res) => {
           include: [
             {
               model: Inventory,
-              attributes: ["quantity"],  
+              attributes: ["quantity"],
             },
           ],
-        },
-        {
-          model: Category,
-          as: 'category',
-          attributes: ["id", "name"],
         },
         {
           model: Discount,
@@ -32,60 +37,65 @@ const getProducts = async (req, res) => {
           attributes: ["id", "code", "discount_type", "discount_value", "start_date", "end_date"],
         }
       ],
-      order: [["createdAt", "DESC"]],
     });
 
-    // Format lại dữ liệu để thêm số lượng tồn kho và số lượng biến thể vào mỗi sản phẩm
-    const formattedProducts = products.map(product => {
+    const formattedProducts = await Promise.all(products.map(async (product) => {
       const productData = product.toJSON();
 
-      // Tính tổng số lượng tồn kho từ tất cả các ProductItem
       let inventory = 0;
       if (productData.ProductItems) {
         productData.ProductItems.forEach(item => {
-          // Kiểm tra xem có thông tin tồn kho không
-          if (item.Inventory && item.Inventory.quantity) {
-            inventory += item.Inventory.quantity; // Cộng dồn số lượng tồn kho
+          if (item.Inventory?.quantity) {
+            inventory += item.Inventory.quantity;
           }
         });
       }
 
-      // Thêm số lượng tồn kho vào dữ liệu sản phẩm
       productData.inventory = inventory;
+
+      // 👇 Tính status mong muốn
+      let expectedStatus = "in stock";
+      if (inventory <= outThreshold) {
+        expectedStatus = "out of stock";
+      } else if (inventory <= lowThreshold) {
+        expectedStatus = "low stock";
+      }
+      
+
+      // 👇 Nếu khác status hiện tại, cập nhật lại
+      if (product.status !== expectedStatus) {
+        await Product.update(
+          { status: expectedStatus },
+          { where: { id: product.id } }
+        );
+        productData.status = expectedStatus; // cập nhật trong kết quả trả ra luôn
+      }
 
       // Tính giá sau khi áp dụng giảm giá
       const originalPrice = parseFloat(productData.price);
-      let salePrice = null; // Khởi tạo salePrice là null nếu không có giảm giá
+      let salePrice = null;
 
-      // Kiểm tra xem sản phẩm có mã giảm giá hợp lệ không
       const currentDate = new Date();
-      const activeDiscounts = productData.Discounts?.filter(discount => 
-        new Date(discount.start_date) <= currentDate && 
+      const activeDiscounts = productData.Discounts?.filter(discount =>
+        new Date(discount.start_date) <= currentDate &&
         new Date(discount.end_date) >= currentDate
       ) || [];
 
       if (activeDiscounts.length > 0) {
-        // Áp dụng mã giảm giá đầu tiên tìm thấy (hoặc có thể áp dụng mã giảm giá có giá trị cao nhất)
         const discount = activeDiscounts[0];
         const discountValue = parseFloat(discount.discount_value);
-        
         if (discount.discount_type === 'percentage') {
-          // Giảm giá theo phần trăm
           salePrice = originalPrice - (originalPrice * (discountValue / 100));
         } else if (discount.discount_type === 'fixed') {
-          // Giảm giá cố định
           salePrice = Math.max(0, originalPrice - discountValue);
         }
-        
-        // Làm tròn giá đến 2 chữ số thập phân
         salePrice = Math.round(salePrice * 100) / 100;
       }
 
-      // Thêm giá sau khi giảm vào dữ liệu sản phẩm
       productData.salePrice = salePrice;
 
       return productData;
-    });
+    }));
 
     res.status(200).json(formattedProducts);
   } catch (error) {
@@ -106,8 +116,10 @@ const getProductById = async (req, res) => {
         "summary",
         "slug",
         "image",
-        "status",
+        "isDeleted",
+        "isActive",
         "price",
+        "status",
         "sku",
         "barcode",
         "createdAt",
@@ -133,6 +145,10 @@ const getProductById = async (req, res) => {
             {
               model: ProductImage,
               attributes: ["id", "image_url", "is_primary"],
+            },
+            {
+              model: Inventory,
+              attributes: ["quantity"],
             },
           ],
         },
@@ -163,84 +179,95 @@ const getProductById = async (req, res) => {
     });
 
     if (!product) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Không tìm thấy sản phẩm" 
+        message: "Không tìm thấy sản phẩm"
       });
     }
 
-    // Format lại dữ liệu
     const productData = product.toJSON();
-    
-    // Tìm ảnh cover chính
+
+    // Tính tổng tồn kho
+    let inventory = 0;
+    productData.ProductItems?.forEach(item => {
+      if (item.Inventory && item.Inventory.quantity) {
+        inventory += item.Inventory.quantity;
+      }
+    });
+    productData.inventory = inventory;
+
+    // Cập nhật lại status nếu cần
+    const shouldBeStatus = inventory > 0 ? 'in stock' : 'out of stock';
+    if (product.status !== shouldBeStatus) {
+      await product.update({ status: shouldBeStatus });
+      productData.status = shouldBeStatus;
+    }
+
+    // Tìm ảnh chính nếu chưa có image
     const primaryImage = product.ProductImages?.find(img => img.is_primary) || product.ProductImages?.[0];
     if (primaryImage && !productData.image) {
       productData.image = primaryImage.image_url;
     }
-    
-    // Thêm thông tin giá
+
+    // Thêm min/max price
     if (productData.ProductItems && productData.ProductItems.length > 0) {
       const prices = productData.ProductItems.map(item => parseFloat(item.price));
       productData.min_price = Math.min(...prices);
       productData.max_price = Math.max(...prices);
     }
 
-    // Tính giá sau khi áp dụng giảm giá
+    // Tính salePrice nếu có giảm giá
     const originalPrice = parseFloat(productData.price);
     let salePrice = originalPrice;
 
-    // Kiểm tra xem sản phẩm có mã giảm giá hợp lệ không
     const currentDate = new Date();
-    const activeDiscounts = productData.Discounts?.filter(discount => 
-      new Date(discount.start_date) <= currentDate && 
+    const activeDiscounts = productData.Discounts?.filter(discount =>
+      new Date(discount.start_date) <= currentDate &&
       new Date(discount.end_date) >= currentDate
     ) || [];
 
     if (activeDiscounts.length > 0) {
-      // Áp dụng mã giảm giá đầu tiên tìm thấy (hoặc có thể áp dụng mã giảm giá có giá trị cao nhất)
       const discount = activeDiscounts[0];
       const discountValue = parseFloat(discount.discount_value);
-      
+
       if (discount.discount_type === 'percentage') {
-        // Giảm giá theo phần trăm
         salePrice = originalPrice - (originalPrice * (discountValue / 100));
       } else if (discount.discount_type === 'fixed') {
-        // Giảm giá cố định
         salePrice = Math.max(0, originalPrice - discountValue);
       }
-      
-      // Làm tròn giá đến 2 chữ số thập phân
+
       salePrice = Math.round(salePrice * 100) / 100;
     }
 
-    // Thêm giá sau khi giảm vào dữ liệu sản phẩm
     productData.salePrice = salePrice;
 
     res.status(200).json({
       success: true,
       data: productData
     });
+
   } catch (error) {
     console.error("Error fetching product:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: "Lỗi server khi lấy thông tin sản phẩm" 
+      message: "Lỗi server khi lấy thông tin sản phẩm"
     });
   }
 };
+
 
 const createProduct = async (req, res) => {
   try {
     const { name, description, summary, slug, image, status, category_id, product_items } = req.body;
 
-    const newProduct = await Product.create({ 
-      name, 
-      description, 
-      summary, 
-      slug, 
-      image, 
-      status, 
-      category_id 
+    const newProduct = await Product.create({
+      name,
+      description,
+      summary,
+      slug,
+      image,
+      status,
+      category_id
     });
 
     if (product_items?.length) {
@@ -250,7 +277,7 @@ const createProduct = async (req, res) => {
             product_id: newProduct.id,
             sku: item.sku,
             price: item.price,
-         
+
             weight: item.weight,
             dimensions: item.dimensions,
             attributes: item.attributes,
@@ -262,16 +289,16 @@ const createProduct = async (req, res) => {
       );
     }
 
-    res.status(201).json({ 
+    res.status(201).json({
       success: true,
-      message: "Thêm sản phẩm thành công", 
-      data: newProduct 
+      message: "Thêm sản phẩm thành công",
+      data: newProduct
     });
   } catch (error) {
     console.error("Error creating product:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: "Lỗi server khi thêm sản phẩm" 
+      message: "Lỗi server khi thêm sản phẩm"
     });
   }
 };
@@ -279,36 +306,38 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, summary, slug, image, status, category_id } = req.body;
+    const { name, description, summary, slug, image, status, category_id, isDeleted } = req.body;
+    console.log(req.body);
 
     const product = await Product.findByPk(id);
     if (!product) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Không tìm thấy sản phẩm" 
+        message: "Không tìm thấy sản phẩm"
       });
     }
 
-    await product.update({ 
-      name, 
-      description, 
-      summary, 
-      slug, 
-      image, 
-      status, 
-      category_id 
+    await product.update({
+      name: name || product.name,
+      description: description || product.description,
+      summary: summary || product.summary,
+      slug: slug || product.slug,
+      image: image || product.image,
+      status: status || product.status,
+      category_id: category_id || product.category_id,
+      isDeleted: isDeleted ?? product.isDeleted
     });
-    
-    res.status(200).json({ 
+
+    res.status(200).json({
       success: true,
-      message: "Cập nhật sản phẩm thành công", 
-      data: product 
+      message: "Cập nhật sản phẩm thành công",
+      data: product
     });
   } catch (error) {
     console.error("Error updating product:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: "Lỗi server khi cập nhật sản phẩm" 
+      message: "Lỗi server khi cập nhật sản phẩm"
     });
   }
 };
@@ -319,27 +348,30 @@ const deleteProduct = async (req, res) => {
     const product = await Product.findByPk(id);
 
     if (!product) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Không tìm thấy sản phẩm" 
+        message: "Không tìm thấy sản phẩm"
       });
     }
 
-    // Soft delete - chỉ cập nhật trạng thái
-    await product.update({ status: 'deleted' });
-    
-    res.status(200).json({ 
+    await product.update({
+      isDeleted: true,
+      status: 'deleted'
+    });
+
+    res.status(200).json({
       success: true,
-      message: "Xóa sản phẩm thành công" 
+      message: "Xóa sản phẩm thành công"
     });
   } catch (error) {
     console.error("Error deleting product:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: "Lỗi server khi xóa sản phẩm" 
+      message: "Lỗi server khi xóa sản phẩm"
     });
   }
 };
+
 
 const productController = {
   getProducts,

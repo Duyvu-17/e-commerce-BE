@@ -25,12 +25,13 @@ async function seedProducts() {
     const productsData = [
       {
         name: 'Áo Thun Cotton Classic',
-        description: 'Áo thun cotton thoáng mát và thoải mái cho mọi hoạt động hàng ngày. Được làm từ chất liệu vải cotton cao cấp, mềm mại và dễ chịu trên da. Thiết kế cổ tròn cổ điển và tay ngắn tạo nên vẻ ngoài đơn giản nhưng không kém phần thanh lịch, dễ dàng kết hợp với nhiều trang phục khác.',
+        description: 'Áo thun cotton thoáng mát và thoải mái cho mọi hoạt động hàng ngày. Được làm từ chất liệu vải cotton cao cấp, mềm mại và dễ chịu trên da. Thiết kế cổ tròn cổ điển và tay ngắn tạo nên vẻ ngoài đơn giản nhưng không kém phần thanh lịch.',
         summary: 'Áo thun cotton cao cấp với thiết kế cổ điển.',
         slug: 'ao-thun-cotton-classic',
         image: 'https://example.com/images/ao-thun-main.jpg',
         price: 299000,
-        category_id: category.id,
+        category_id: 1, // ID danh mục (ví dụ: thời trang)
+        status: 'in stock',
         items: [
           {
             name: 'Áo Thun Cotton Classic - Trắng size S',
@@ -38,7 +39,7 @@ async function seedProducts() {
             price: 299000,
             color: 'Trắng',
             size: 'S',
-            attributes: { material: '100% Cotton', care: 'Giặt máy với nước lạnh' }
+            attributes: { material: '100% Cotton', care: 'Giặt máy với nước lạnh' },
           },
           {
             name: 'Áo Thun Cotton Classic - Trắng size M',
@@ -46,7 +47,7 @@ async function seedProducts() {
             price: 299000,
             color: 'Trắng',
             size: 'M',
-            attributes: { material: '100% Cotton', care: 'Giặt máy với nước lạnh' }
+            attributes: { material: '100% Cotton', care: 'Giặt máy với nước lạnh' },
           },
           {
             name: 'Áo Thun Cotton Classic - Đen size S',
@@ -54,8 +55,8 @@ async function seedProducts() {
             price: 299000,
             color: 'Đen',
             size: 'S',
-            attributes: { material: '100% Cotton', care: 'Giặt máy với nước lạnh' }
-          }
+            attributes: { material: '100% Cotton', care: 'Giặt máy với nước lạnh' },
+          },
         ],
       },
       {
@@ -65,7 +66,8 @@ async function seedProducts() {
         slug: 'quan-jeans-slim-fit',
         image: 'https://example.com/images/jeans-main.jpg',
         price: 599000,
-        category_id: category.id,
+        category_id: 1, // ID danh mục (ví dụ: thời trang)
+        status: 'in stock',
         items: [
           {
             name: 'Quần Jeans Slim Fit - Xanh size 30',
@@ -73,7 +75,7 @@ async function seedProducts() {
             price: 599000,
             color: 'Xanh',
             size: '30',
-            attributes: { material: '98% Cotton, 2% Spandex', care: 'Giặt máy với nước lạnh, sấy khô ở nhiệt độ thấp' }
+            attributes: { material: '98% Cotton, 2% Spandex', care: 'Giặt máy với nước lạnh, sấy khô ở nhiệt độ thấp' },
           },
           {
             name: 'Quần Jeans Slim Fit - Xanh size 32',
@@ -81,8 +83,8 @@ async function seedProducts() {
             price: 599000,
             color: 'Xanh',
             size: '32',
-            attributes: { material: '98% Cotton, 2% Spandex', care: 'Giặt máy với nước lạnh, sấy khô ở nhiệt độ thấp' }
-          }
+            attributes: { material: '98% Cotton, 2% Spandex', care: 'Giặt máy với nước lạnh, sấy khô ở nhiệt độ thấp' },
+          },
         ],
       },
       {
@@ -92,7 +94,8 @@ async function seedProducts() {
         slug: 'tui-deo-cheo-da',
         image: 'https://example.com/images/tui-main.jpg',
         price: 899000,
-        category_id: category.id,
+        category_id: 1, // ID danh mục (ví dụ: phụ kiện)
+        status: 'in stock',
         items: [
           {
             name: 'Túi Đeo Chéo Da - Nâu',
@@ -100,7 +103,7 @@ async function seedProducts() {
             price: 899000,
             color: 'Nâu',
             size: 'Tiêu chuẩn',
-            attributes: { material: 'Da thật 100%', care: 'Lau bằng khăn ẩm' }
+            attributes: { material: 'Da thật 100%', care: 'Lau bằng khăn ẩm' },
           },
           {
             name: 'Túi Đeo Chéo Da - Đen',
@@ -108,8 +111,8 @@ async function seedProducts() {
             price: 899000,
             color: 'Đen',
             size: 'Tiêu chuẩn',
-            attributes: { material: 'Da thật 100%', care: 'Lau bằng khăn ẩm' }
-          }
+            attributes: { material: 'Da thật 100%', care: 'Lau bằng khăn ẩm' },
+          },
         ],
       },
       {
@@ -119,7 +122,8 @@ async function seedProducts() {
         slug: 'tai-nghe-bluetooth-khong-day',
         image: 'https://example.com/images/tai-nghe-main.jpg',
         price: 1299000,
-        category_id: category.id,
+        category_id: 2, // ID danh mục (ví dụ: thiết bị điện tử)
+        status: 'in stock',
         items: [
           {
             name: 'Tai Nghe Bluetooth Không Dây - Đen',
@@ -127,7 +131,7 @@ async function seedProducts() {
             price: 1299000,
             color: 'Đen',
             size: 'Tiêu chuẩn',
-            attributes: { connectivity: 'Bluetooth 5.0', batteryLife: '30 giờ', features: ['Chống ồn chủ động', 'Sạc nhanh'] }
+            attributes: { connectivity: 'Bluetooth 5.0', batteryLife: '30 giờ', features: ['Chống ồn chủ động', 'Sạc nhanh'] },
           },
           {
             name: 'Tai Nghe Bluetooth Không Dây - Trắng',
@@ -135,8 +139,8 @@ async function seedProducts() {
             price: 1299000,
             color: 'Trắng',
             size: 'Tiêu chuẩn',
-            attributes: { connectivity: 'Bluetooth 5.0', batteryLife: '30 giờ', features: ['Chống ồn chủ động', 'Sạc nhanh'] }
-          }
+            attributes: { connectivity: 'Bluetooth 5.0', batteryLife: '30 giờ', features: ['Chống ồn chủ động', 'Sạc nhanh'] },
+          },
         ],
       },
       {
@@ -146,7 +150,8 @@ async function seedProducts() {
         slug: 'dong-ho-thong-minh-theo-doi-suc-khoe',
         image: 'https://example.com/images/dong-ho-main.jpg',
         price: 1499000,
-        category_id: category.id,
+        category_id: 2, // ID danh mục (ví dụ: thiết bị điện tử)
+        status: 'in stock',
         items: [
           {
             name: 'Đồng Hồ Thông Minh Theo Dõi Sức Khỏe - Đen',
@@ -154,7 +159,7 @@ async function seedProducts() {
             price: 1499000,
             color: 'Đen',
             size: 'Tiêu chuẩn',
-            attributes: { waterResistant: '50m', batteryLife: '7 ngày', features: ['Theo dõi nhịp tim', 'GPS', 'Theo dõi giấc ngủ'] }
+            attributes: { waterResistant: '50m', batteryLife: '7 ngày', features: ['Theo dõi nhịp tim', 'GPS', 'Theo dõi giấc ngủ'] },
           },
           {
             name: 'Đồng Hồ Thông Minh Theo Dõi Sức Khỏe - Xanh',
@@ -162,7 +167,7 @@ async function seedProducts() {
             price: 1499000,
             color: 'Xanh',
             size: 'Tiêu chuẩn',
-            attributes: { waterResistant: '50m', batteryLife: '7 ngày', features: ['Theo dõi nhịp tim', 'GPS', 'Theo dõi giấc ngủ'] }
+            attributes: { waterResistant: '50m', batteryLife: '7 ngày', features: ['Theo dõi nhịp tim', 'GPS', 'Theo dõi giấc ngủ'] },
           },
           {
             name: 'Đồng Hồ Thông Minh Theo Dõi Sức Khỏe - Hồng',
@@ -170,11 +175,12 @@ async function seedProducts() {
             price: 1499000,
             color: 'Hồng',
             size: 'Tiêu chuẩn',
-            attributes: { waterResistant: '50m', batteryLife: '7 ngày', features: ['Theo dõi nhịp tim', 'GPS', 'Theo dõi giấc ngủ'] }
-          }
+            attributes: { waterResistant: '50m', batteryLife: '7 ngày', features: ['Theo dõi nhịp tim', 'GPS', 'Theo dõi giấc ngủ'] },
+          },
         ],
       },
     ];
+    
 
     // Tạo sản phẩm
     for (const productData of productsData) {
@@ -187,7 +193,7 @@ async function seedProducts() {
         price: productData.price,
         sku: `SKU-${productData.slug}`,
         barcode: `BARCODE-${productData.slug}`,
-        status: 'active',
+        status: productData.status, // Thêm status vào sản phẩm
         category_id: category.id,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -203,7 +209,7 @@ async function seedProducts() {
           dimensions: '40x30x5 cm',
           attributes: JSON.stringify(item.attributes),
           barcode: `BARCODE-${item.sku}`, // Tạo mã vạch từ SKU
-          status: 'active',
+          status: 'active', // Đặt trạng thái mặc định cho item
           price: item.price,
           color: item.color,
           size: item.size,
@@ -217,13 +223,13 @@ async function seedProducts() {
         {
           product_id: product.id,
           image_url: productData.image,
-          is_primary: true,
+          is_primary: true, // Đặt hình ảnh đầu tiên là primary
         },
         ...productItems.map((item, index) => ({
           product_id: product.id,
           product_item_id: item.id,
           image_url: `https://example.com/images/${productData.slug}-${item.color.toLowerCase()}-${item.size.toLowerCase()}.jpg`,
-          is_primary: index === 0, // Đặt ảnh đầu tiên là primary
+          is_primary: index === 0, // Đặt ảnh đầu tiên của mỗi product item là primary
         })),
       ]);
     }
