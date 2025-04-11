@@ -4,8 +4,7 @@ import Category from "../../models/Category.js";
 const getCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({
-      attributes: ["id", "name", "image", "status", "createdAt"],
-      order: [["createdAt", "DESC"]],
+      attributes: ["id", "name"],
     });
     res.status(200).json(categories);
   } catch (error) {
@@ -19,7 +18,7 @@ const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
     const category = await Category.findByPk(id, {
-      attributes: ["id", "name", "image", "status", "createdAt"],
+      attributes: ["id", "name"],
     });
 
     if (!category) {
@@ -36,17 +35,22 @@ const getCategoryById = async (req, res) => {
 // 📌 Tạo danh mục mới
 const createCategory = async (req, res) => {
   try {
-    const { name, image, status } = req.body;
+    const { name, description } = req.body;
+    const imagePath = req.file ? `/uploads/categories/${req.file.filename}` : null;
+    console.log(imagePath);
 
-    if (!name) {
-      return res.status(400).json({ message: "Tên danh mục không được để trống" });
-    }
+    const newCategory = await Category.create({
+      name,
+      description,
+      image: imagePath,
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
 
-    const newCategory = await Category.create({ name, image, status });
-    res.status(201).json({ message: "Danh mục đã được tạo", category: newCategory });
-  } catch (error) {
-    console.error("Error creating category:", error);
-    res.status(500).json({ message: "Lỗi server khi tạo danh mục" });
+    res.status(201).json(newCategory);
+  } catch (err) {
+    console.error("Error creating category:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
