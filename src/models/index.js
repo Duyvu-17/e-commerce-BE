@@ -48,6 +48,10 @@ ProductItem.belongsTo(Product, { foreignKey: 'product_id' });
 Product.hasMany(ProductImage, { foreignKey: 'product_id' });
 ProductImage.belongsTo(Product, { foreignKey: 'product_id' });
 
+Customer.hasOne(CustomerInfo, { foreignKey: 'customer_id' });
+CustomerInfo.belongsTo(Customer, { foreignKey: 'customer_id' });
+
+
 ProductItem.hasMany(ProductImage, { foreignKey: 'product_item_id' });
 ProductImage.belongsTo(ProductItem, { foreignKey: 'product_item_id' });
 // Category & Product
@@ -176,6 +180,9 @@ DiscountUsage.belongsTo(Discount, { foreignKey: 'discount_id' });
 
 Customer.hasMany(DiscountUsage, { foreignKey: 'customer_id' });
 DiscountUsage.belongsTo(Customer, { foreignKey: 'customer_id' });
+
+Orders.hasOne(ShippingAddress, { foreignKey: 'order_id' });
+ShippingAddress.belongsTo(Orders, { foreignKey: 'order_id' });
 
 
 

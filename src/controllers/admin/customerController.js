@@ -1,3 +1,10 @@
+import CustomerInfo from "../../models/CustomerInfo.js";
+import CustomerPaymentMethod from "../../models/CustomerPaymentMethod.js";
+import Orders from "../../models/Orders.js";
+import OrderItem from "../../models/OrderItem.js";
+import ProductItem from "../../models/ProductItem.js";
+import Product from "../../models/Product.js";
+import ProductImage from "../../models/ProductImage.js";
 import Customer from "../../models/Customer.js";
 
 const customerController = {
@@ -5,8 +12,14 @@ const customerController = {
   getCustomers: async (req, res, next) => {
     try {
       const customers = await Customer.findAll({
-        attributes: ["id", "name", "email", "phone", "createdAt"],
-        order: [["createdAt", "DESC"]],
+        attributes: ["id", "email", "status", "isVerified", "created_at"],
+        include: [
+          {
+            model: CustomerInfo,
+            attributes: ["fullname", "phone_number"],
+            required: false,
+          },
+        ],
       });
 
       res.status(200).json({ status: "success", data: customers });
@@ -20,7 +33,56 @@ const customerController = {
     try {
       const { id } = req.params;
       const customer = await Customer.findByPk(id, {
-        attributes: ["id", "name", "email", "phone", "address", "createdAt"],
+        attributes: ["id", "email", "status", "isVerified", "created_at"],
+        include: [
+          {
+            model: CustomerInfo,
+            attributes: [
+              "fullname", "first_name", "last_name", "avatar",
+              "phone_number", "birth_date"
+            ],
+            required: false,
+          },
+          {
+            model: CustomerPaymentMethod,
+            attributes: ["id", "method_type", "is_active", "created_at"],
+            required: false,
+          },
+          {
+            model: Orders,
+            attributes: ["id", "total_amount", "status", "created_at"],
+            include: [
+              {
+                model: OrderItem,
+                attributes: ["quantity", "unit_price", "discounted_price"],
+                include: [
+                  {
+                    model: ProductItem,
+                    attributes: ["sku"],
+                    include: [
+                      {
+                        model: Product,
+                        attributes: ["name"],
+                        include: [
+                          {
+                            model: ProductImage,
+                            attributes: ["image_url"],
+                            where: { is_primary: true },
+                            required: false,
+                          },
+                        ],
+                        required: false,
+                      },
+                    ],
+                    required: false,
+                  },
+                ],
+                required: false,
+              },
+            ],
+            required: false,
+          },
+        ],
       });
 
       if (!customer) {
@@ -32,7 +94,6 @@ const customerController = {
       next(error);
     }
   },
-
   // 📌 Cập nhật thông tin khách hàng
   updateCustomer: async (req, res, next) => {
     try {

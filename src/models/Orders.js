@@ -60,6 +60,10 @@ Orders.init(
         isIn: [['pending', 'paid', 'shipped', 'completed', 'cancelled']],
       },
     },
+    order_number: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
