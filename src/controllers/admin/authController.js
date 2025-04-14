@@ -22,7 +22,46 @@ const generateRefreshToken = (employee) => {
     { expiresIn: JWT_EXPIRES_IN }
   );
 };
+const getUserInfo = async (req, res) => {
+  try {
+    if (!req.employee || !req.employee.id) {
+      return res.status(401).json({ message: "Không có thông tin người dùng!" });
+    }
 
+    const employee = await Employee.findByPk(req.employee.id, {
+      attributes: ["id", "email", "avatar", "full_name","role_id"],
+    });
+
+    if (!employee) {
+      return res.status(404).json({ message: "Người dùng không tồn tại!" });
+    }
+    
+    let roleInfo = { id: employee.role_id };
+    if (employee.role_id) {
+      const role = await Role.findByPk(employee.role_id);
+      if (role) {
+        roleInfo = {
+          id: role.id,
+          name: role.name,
+          permissions: role.permissions, 
+        };
+      }
+    }
+
+    res.json({
+      message: "Thông tin người dùng",
+      user: {
+        id: employee.id,
+        email: employee.email,
+        role: roleInfo,
+        avatar: employee.avatar,
+        full_name: employee.full_name,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server!", error: error.message });
+  }
+};
 const register = async (req, res) => {
   try {
     const { fullName, email, password, role } = req.body;
@@ -136,7 +175,7 @@ const login = async (req, res) => {
       refreshToken,
       user: {
         id: employee.id,
-        name: employee.full_name,
+        full_name: employee.full_name,
         email: employee.email,
         role: roleInfo,
         avatar: employee.avatar
@@ -253,7 +292,7 @@ const logout = async (req, res) => {
 };
 
 const authController = {
-  register, login, verifyToken, logout, refreshToken
+  register, login, verifyToken, logout, refreshToken,getUserInfo
 };
 
 export default authController;

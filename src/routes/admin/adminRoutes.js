@@ -17,6 +17,7 @@ adminRoutes.post("/register", authController.register);
 adminRoutes.post("/verify-Token", authController.verifyToken);
 adminRoutes.post("/logout", authController.logout);
 adminRoutes.post("/refresh-token", authController.refreshToken );
+adminRoutes.get("/auth/me", Middleware.authMiddleware, authController.getUserInfo);
 
 // 🔹 Các route dưới đây yêu cầu xác thực
 adminRoutes.use(Middleware.authMiddleware); 
