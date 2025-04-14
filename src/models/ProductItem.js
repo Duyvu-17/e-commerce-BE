@@ -53,7 +53,7 @@ ProductItem.init(
     status: {
       type: DataTypes.STRING(255),
       validate: {
-        isIn: [['active', 'inactive', 'out_of_stock']],
+        isIn: [['out of stock', 'in stock', 'low stock']],
       },
       defaultValue: 'active',
     },
