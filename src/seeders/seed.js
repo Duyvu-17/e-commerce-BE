@@ -1,9 +1,9 @@
 
 
 
-import Employee from "./src/models/Employee.js";
-import Role from "./src/models/Role.js";
-import sequelize from './src/config/database.js';
+import Employee from "../models/Employee.js";
+import Role from "../models/Role.js";
+import sequelize from '../config/database.js';
 
 async function createRoles() {
   // Kiểm tra xem các vai trò đã tồn tại chưa

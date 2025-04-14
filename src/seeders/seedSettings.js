@@ -1,6 +1,6 @@
 // seedSettings.js
-import sequelize from './src/config/database.js';
-import Settings from './src/models/Settings.js';
+import sequelize from '../config/database.js';
+import Settings from '../models/Settings.js';
 
 const settings = [
   {

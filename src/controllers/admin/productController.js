@@ -120,6 +120,7 @@ const getProductById = async (req, res) => {
         "isActive",
         "price",
         "status",
+        "category_id",
         "sku",
         "barcode",
         "createdAt",
@@ -151,17 +152,6 @@ const getProductById = async (req, res) => {
               attributes: ["quantity"],
             },
           ],
-        },
-        {
-          model: ProductImage,
-          attributes: ["id", "image_url", "is_primary"],
-          where: { product_item_id: null },
-          required: false,
-        },
-        {
-          model: Category,
-          as: "category",
-          attributes: ["id", "name"],
         },
         {
           model: Discount,

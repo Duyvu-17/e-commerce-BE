@@ -1,8 +1,8 @@
-import Category from "./src/models/Category.js";
-import Product from "./src/models/Product.js";
-import ProductItem from "./src/models/ProductItem.js";
-import ProductImage from "./src/models/ProductImage.js";
-import sequelize from './src/config/database.js';
+import Category from "../models/Category.js";
+import Product from "../models/Product.js";
+import ProductItem from "../models/ProductItem.js";
+import ProductImage from "../models/ProductImage.js";
+import sequelize from '../config/database.js';
 
 async function seedProducts() {
   try {

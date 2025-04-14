@@ -1,8 +1,8 @@
 
-import Discount from "./src/models/Discount.js";
-import Product from "./src/models/Product.js";
-import DiscountProduct from "./src/models/DiscountProduct.js";
-import sequelize from './src/config/database.js';
+import Discount from "../models/Discount.js";
+import Product from "../models/Product.js";
+import DiscountProduct from "../models/DiscountProduct.js";
+import sequelize from '../config/database.js';
 
 async function seedDiscountsAndProducts() {
   try {
