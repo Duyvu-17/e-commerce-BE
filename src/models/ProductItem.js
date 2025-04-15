@@ -49,14 +49,6 @@ ProductItem.init(
       type: DataTypes.STRING(255), 
       unique: true, 
     },
-
-    status: {
-      type: DataTypes.STRING(255),
-      validate: {
-        isIn: [['out of stock', 'in stock', 'low stock']],
-      },
-      defaultValue: 'active',
-    },
     price: {
       type: DataTypes.DECIMAL(10, 2),
     },

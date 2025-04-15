@@ -3,7 +3,8 @@ import express from "express";
 import routes from "./src/routes/customer/index.js";
 import adminRoutes from "./src/routes/admin/adminRoutes.js";
 import db from "./src/models/index.js";
-import cors from "cors";  
+import cors from "cors";
+import path from 'path';  
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 // Các route API của bạn
 app.use("/api", routes);
 app.use("/api-admin", adminRoutes);
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 
 db.sequelize.sync({ alter: true })

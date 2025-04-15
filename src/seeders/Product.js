@@ -15,7 +15,7 @@ async function seedProducts() {
       category = await Category.create({
         name: 'Thời trang',
         description: 'Sản phẩm thời trang chất lượng cao',
-        image: 'https://example.com/images/thoi-trang.jpg',
+        image: 'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D',
         created_at: new Date(),
         updated_at: new Date(),
       });
@@ -28,7 +28,7 @@ async function seedProducts() {
         description: 'Áo thun cotton thoáng mát và thoải mái cho mọi hoạt động hàng ngày. Được làm từ chất liệu vải cotton cao cấp, mềm mại và dễ chịu trên da. Thiết kế cổ tròn cổ điển và tay ngắn tạo nên vẻ ngoài đơn giản nhưng không kém phần thanh lịch.',
         summary: 'Áo thun cotton cao cấp với thiết kế cổ điển.',
         slug: 'ao-thun-cotton-classic',
-        image: 'https://example.com/images/ao-thun-main.jpg',
+        image: 'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D',
         price: 299000,
         category_id: 1, // ID danh mục (ví dụ: thời trang)
         status: 'in stock',
@@ -64,7 +64,7 @@ async function seedProducts() {
         description: 'Quần jeans ôm dáng hiện đại, được làm từ chất liệu denim cao cấp. Thiết kế vừa vặn hoàn hảo, tôn lên dáng người mặc với sự thoải mái vừa đủ. Chất liệu bền bỉ, co giãn nhẹ giúp duy trì form dáng qua nhiều lần sử dụng.',
         summary: 'Quần jeans ôm dáng với độ co giãn thoải mái.',
         slug: 'quan-jeans-slim-fit',
-        image: 'https://example.com/images/jeans-main.jpg',
+        image: 'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D',
         price: 599000,
         category_id: 1, // ID danh mục (ví dụ: thời trang)
         status: 'in stock',
@@ -92,7 +92,7 @@ async function seedProducts() {
         description: 'Túi đeo chéo thanh lịch làm từ da thật cao cấp. Phụ kiện thời trang này có nhiều ngăn tiện lợi, dây đeo điều chỉnh được và các chi tiết kim loại màu vàng sang trọng. Sử dụng được trong cả trang phục thường ngày và dự tiệc.',
         summary: 'Túi đeo chéo da thật với nhiều ngăn tiện dụng.',
         slug: 'tui-deo-cheo-da',
-        image: 'https://example.com/images/tui-main.jpg',
+        image: 'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D',
         price: 899000,
         category_id: 1, // ID danh mục (ví dụ: phụ kiện)
         status: 'in stock',
@@ -120,7 +120,7 @@ async function seedProducts() {
         description: 'Tai nghe hiệu suất cao với công nghệ Bluetooth 5.0. Trải nghiệm chất lượng âm thanh sống động, tính năng chống ồn chủ động và thời lượng pin lên đến 30 giờ. Thiết kế công thái học đảm bảo sự thoải mái khi sử dụng lâu.',
         summary: 'Tai nghe không dây cao cấp với tính năng chống ồn.',
         slug: 'tai-nghe-bluetooth-khong-day',
-        image: 'https://example.com/images/tai-nghe-main.jpg',
+        image: 'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D',
         price: 1299000,
         category_id: 2, // ID danh mục (ví dụ: thiết bị điện tử)
         status: 'in stock',
@@ -148,7 +148,7 @@ async function seedProducts() {
         description: 'Đồng hồ thông minh với tính năng theo dõi nhịp tim, giấc ngủ và GPS. Màn hình cảm ứng sống động cho phép truy cập dễ dàng vào dữ liệu luyện tập, thông báo và ứng dụng. Thiết kế chống nước phù hợp cho bơi lội và các hoạt động ngoài trời.',
         summary: 'Đồng hồ thông minh đa chức năng với theo dõi nhịp tim.',
         slug: 'dong-ho-thong-minh-theo-doi-suc-khoe',
-        image: 'https://example.com/images/dong-ho-main.jpg',
+        image: 'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D',
         price: 1499000,
         category_id: 2, // ID danh mục (ví dụ: thiết bị điện tử)
         status: 'in stock',
@@ -180,7 +180,7 @@ async function seedProducts() {
         ],
       },
     ];
-    
+
 
     // Tạo sản phẩm
     for (const productData of productsData) {
@@ -203,7 +203,7 @@ async function seedProducts() {
       const productItems = await ProductItem.bulkCreate(
         productData.items.map(item => ({
           product_id: product.id,
-          name: item.name, 
+          name: item.name,
           sku: item.sku,
           weight: 250,
           dimensions: '40x30x5 cm',
@@ -228,7 +228,7 @@ async function seedProducts() {
         ...productItems.map((item, index) => ({
           product_id: product.id,
           product_item_id: item.id,
-          image_url: `https://example.com/images/${productData.slug}-${item.color.toLowerCase()}-${item.size.toLowerCase()}.jpg`,
+          image_url: `https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D`,
           is_primary: index === 0, // Đặt ảnh đầu tiên của mỗi product item là primary
         })),
       ]);

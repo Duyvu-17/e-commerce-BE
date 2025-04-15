@@ -33,10 +33,6 @@ ProductImage.init(
     image_url: {
       type: DataTypes.STRING(255),
     },
-    is_primary: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
   },
   {
     sequelize,

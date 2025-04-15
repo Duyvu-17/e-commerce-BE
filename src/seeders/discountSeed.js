@@ -1,4 +1,3 @@
-
 import Discount from "../models/Discount.js";
 import Product from "../models/Product.js";
 import DiscountProduct from "../models/DiscountProduct.js";
@@ -36,9 +35,9 @@ async function seedDiscountsAndProducts() {
 
     console.log('Các mã giảm giá đã được tạo thành công!');
 
-    // Lấy sản phẩm từ bảng Product (Giả sử bạn có sản phẩm với tên 'Product A' và 'Product B')
-    const product1 = await Product.findOne({ where: { name: 'OnePlus 11' } });
-    const product2 = await Product.findOne({ where: { name: 'Xiaomi 13 Pro' } });
+    // Lấy sản phẩm từ bảng Product theo ID (sản phẩm có id = 1 và id = 2)
+    const product1 = await Product.findOne({ where: { id: 1 } });
+    const product2 = await Product.findOne({ where: { id: 2 } });
 
     if (!product1 || !product2) {
       throw new Error('Sản phẩm không tồn tại trong cơ sở dữ liệu.');

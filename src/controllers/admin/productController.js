@@ -6,10 +6,8 @@ import Category from "../../models/Category.js";
 import Discount from "../../models/Discount.js";
 import DiscountProduct from "../../models/DiscountProduct.js";
 import Settings from "../../models/Settings.js";
-
 const getProducts = async (req, res) => {
   try {
-    // Lấy threshold từ Settings
     const [lowStockSetting, outOfStockSetting] = await Promise.all([
       Settings.findOne({ where: { setting_key: "low_stock_threshold" } }),
       Settings.findOne({ where: { setting_key: "out_of_stock_threshold" } }),
@@ -60,7 +58,7 @@ const getProducts = async (req, res) => {
       } else if (inventory <= lowThreshold) {
         expectedStatus = "low stock";
       }
-      
+
 
       // 👇 Nếu khác status hiện tại, cập nhật lại
       if (product.status !== expectedStatus) {
@@ -119,7 +117,6 @@ const getProductById = async (req, res) => {
         "isDeleted",
         "isActive",
         "price",
-        "status",
         "category_id",
         "sku",
         "barcode",
@@ -136,7 +133,6 @@ const getProductById = async (req, res) => {
             "weight",
             "dimensions",
             "attributes",
-            "status",
             "color",
             "size",
             "name",
@@ -145,7 +141,7 @@ const getProductById = async (req, res) => {
           include: [
             {
               model: ProductImage,
-              attributes: ["id", "image_url", "is_primary"],
+              attributes: ["id", "image_url"],
             },
             {
               model: Inventory,
@@ -194,7 +190,7 @@ const getProductById = async (req, res) => {
     }
 
     // Tìm ảnh chính nếu chưa có image
-    const primaryImage = product.ProductImages?.find(img => img.is_primary) || product.ProductImages?.[0];
+    const primaryImage = product.ProductImages?.find(img => img) || product.ProductImages?.[0];
     if (primaryImage && !productData.image) {
       productData.image = primaryImage.image_url;
     }
@@ -245,38 +241,130 @@ const getProductById = async (req, res) => {
   }
 };
 
-
 const createProduct = async (req, res) => {
-  try {
-    const { name, description, summary, slug, image, status, category_id, product_items } = req.body;
 
+  
+  try {
+    // Lấy dữ liệu cơ bản từ req.body
+    const {
+      name, 
+      description, 
+      summary, 
+      slug, 
+      status, 
+      category_id,
+      price, 
+      salePrice,
+      sku,
+      barcode,
+      inventory,
+      isActive
+    } = req.body;
+
+    // Lấy đường dẫn hình ảnh từ file upload
+    const imagePath = req.files && req.files.image && req.files.image[0] 
+      ? `/uploads/product/${req.files.image[0].filename}` 
+      : null;
+      console.log(imagePath);
+    // Tạo sản phẩm mới
     const newProduct = await Product.create({
       name,
       description,
       summary,
       slug,
-      image,
+      image: imagePath,
       status,
-      category_id
+      category_id: Number(category_id),
+      price: Number(price),
+      salePrice: salePrice ? Number(salePrice) : null,
+      sku,
+      barcode,
+      inventory: Number(inventory),
+      isActive: isActive === 'true'
     });
 
-    if (product_items?.length) {
-      await Promise.all(
-        product_items.map(async (item) =>
-          ProductItem.create({
-            product_id: newProduct.id,
-            sku: item.sku,
-            price: item.price,
+    // Xử lý product items từ FormData
+    // Phân tích các trường có cấu trúc productItem_index_property
+    const productItemsMap = new Map();
+    
+    // Lặp qua tất cả các keys trong req.body để tìm và nhóm các productItem
+    Object.keys(req.body).forEach(key => {
+      if (key.startsWith('productItem_')) {
+        const parts = key.split('_');
+        const index = parts[1];
+        const property = parts.slice(2).join('_');
+        
+        if (!productItemsMap.has(index)) {
+          productItemsMap.set(index, {});
+        }
+        
+        productItemsMap.get(index)[property] = req.body[key];
+      }
+    });
 
-            weight: item.weight,
-            dimensions: item.dimensions,
-            attributes: item.attributes,
-            status: item.status,
-            color: item.color,
-            size: item.size
-          })
-        )
-      );
+    // Xử lý các file images cho product items
+    if (req.files) {
+      // Lặp qua tất cả các keys trong req.files để tìm các file ảnh của productItem
+      Object.keys(req.files).forEach(fieldname => {
+        if (fieldname.startsWith('productItem_')) {
+          const match = fieldname.match(/^productItem_(\d+)_image$/);
+          if (match) {
+            const index = match[1];
+            const files = req.files[fieldname];
+            
+            if (!productItemsMap.has(index)) {
+              productItemsMap.set(index, {});
+            }
+            
+            if (!productItemsMap.get(index).images) {
+              productItemsMap.get(index).images = [];
+            }
+            
+            files.forEach(file => {
+              productItemsMap.get(index).images.push(`/uploads/product_items/${file.filename}`);
+            });
+          }
+        }
+      });
+    }
+
+    // Tạo các product items
+    for (const [_, itemData] of productItemsMap) {
+      const createdItem = await ProductItem.create({
+        product_id: newProduct.id,
+        name: itemData.name || '',
+        sku: itemData.sku || '',
+        price: Number(itemData.price) || 0,
+        weight: itemData.weight || null,
+        dimensions: itemData.dimensions || null,
+        attributes: itemData.attributes || '',
+        status: itemData.status || 'in stock',
+        color: itemData.color || '',
+        size: itemData.size || '',
+        barcode: itemData.barcode || '',
+        Inventory: Number(itemData.inventory) || 0
+      });
+
+      // Xử lý hình ảnh cho product item
+      if (itemData.images && itemData.images.length) {
+        for (const imageUrl of itemData.images) {
+          await ProductImage.create({
+            product_item_id: createdItem.id,
+            image_url: imageUrl,
+          });
+        }
+      }
+      
+      // Xử lý image_url từ FormData
+      for (let i = 0; i < 10; i++) { // Giả sử tối đa 10 ảnh
+        const imageUrlKey = `image_url_${i}`;
+        if (itemData[imageUrlKey]) {
+          await ProductImage.create({
+            product_item_id: createdItem.id,
+            image_url: itemData[imageUrlKey],
+          });
+        }
+      }
     }
 
     res.status(201).json({
@@ -292,12 +380,26 @@ const createProduct = async (req, res) => {
     });
   }
 };
-
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, summary, slug, image, status, category_id, isDeleted } = req.body;
-    console.log(req.body);
+
+    // Lấy dữ liệu cơ bản từ req.body
+    const {
+      name,
+      description,
+      summary,
+      slug,
+      status,
+      category_id,
+      price,
+      salePrice,
+      sku,
+      barcode,
+      inventory,
+      isActive,
+      isDeleted
+    } = req.body;
 
     const product = await Product.findByPk(id);
     if (!product) {
@@ -307,21 +409,139 @@ const updateProduct = async (req, res) => {
       });
     }
 
+    // Xử lý hình ảnh
+    const imagePath = req.file ? `/uploads/product/${req.file.filename}` : req.body.image || product.image;
+    console.log(imagePath);
+    // Cập nhật sản phẩm
     await product.update({
-      name: name || product.name,
-      description: description || product.description,
-      summary: summary || product.summary,
-      slug: slug || product.slug,
-      image: image || product.image,
-      status: status || product.status,
-      category_id: category_id || product.category_id,
-      isDeleted: isDeleted ?? product.isDeleted
+      name,
+      description,
+      summary,
+      slug,
+      image: imagePath,
+      status,
+      category_id: Number(category_id),
+      price: Number(price),
+      salePrice: salePrice ? Number(salePrice) : null,
+      sku,
+      barcode,
+      inventory: Number(inventory),
+      isActive: isActive === 'true',
+      isDeleted: isDeleted === 'true'
     });
+
+    // Xử lý product items từ FormData - tương tự như trong createProduct
+    const productItemsMap = new Map();
+
+    Object.keys(req.body).forEach(key => {
+      if (key.startsWith('productItem_')) {
+        const parts = key.split('_');
+        const index = parts[1];
+        const property = parts.slice(2).join('_');
+
+        if (!productItemsMap.has(index)) {
+          productItemsMap.set(index, {});
+        }
+
+        productItemsMap.get(index)[property] = req.body[key];
+      }
+    });
+
+    // Xử lý files cho productItems
+    if (req.files && Array.isArray(req.files)) {
+      req.files.forEach(file => {
+        const filename = file.fieldname;
+        if (filename.startsWith('productItem_')) {
+          const parts = filename.split('_');
+          const index = parts[1];
+
+          if (!productItemsMap.has(index)) {
+            productItemsMap.set(index, {});
+          }
+
+          if (!productItemsMap.get(index).images) {
+            productItemsMap.get(index).images = [];
+          }
+
+          productItemsMap.get(index).images.push(`/uploads/product_items/${file.filename}`);
+        }
+      });
+    }
+
+    // Cập nhật hoặc tạo mới các product items
+    for (const [_, itemData] of productItemsMap) {
+      let productItem = null;
+
+      if (itemData.id) {
+        productItem = await ProductItem.findByPk(itemData.id);
+        if (productItem) {
+          await productItem.update({
+            name: itemData.name || productItem.name,
+            sku: itemData.sku || productItem.sku,
+            price: Number(itemData.price) || productItem.price,
+            weight: itemData.weight || productItem.weight,
+            dimensions: itemData.dimensions || productItem.dimensions,
+            attributes: itemData.attributes || productItem.attributes,
+            status: itemData.status || productItem.status,
+            color: itemData.color || productItem.color,
+            size: itemData.size || productItem.size,
+            barcode: itemData.barcode || productItem.barcode,
+            Inventory: Number(itemData.inventory) || productItem.Inventory || 0
+          });
+        }
+      } else {
+        productItem = await ProductItem.create({
+          product_id: product.id,
+          name: itemData.name || '',
+          sku: itemData.sku || '',
+          price: Number(itemData.price) || 0,
+          weight: itemData.weight || null,
+          dimensions: itemData.dimensions || null,
+          attributes: itemData.attributes || '',
+          status: itemData.status || 'in stock',
+          color: itemData.color || '',
+          size: itemData.size || '',
+          barcode: itemData.barcode || '',
+          Inventory: Number(itemData.inventory) || 0
+        });
+      }
+
+      // Xử lý hình ảnh cho product item
+      if (itemData.images && itemData.images.length) {
+        // Xóa tất cả hình ảnh cũ nếu cần
+        await ProductImage.destroy({ where: { product_item_id: productItem.id } });
+
+        for (const imageUrl of itemData.images) {
+          await ProductImage.create({
+            product_item_id: productItem.id,
+            image_url: imageUrl,
+          });
+        }
+      }
+
+      // Xử lý image_url từ FormData
+      let hasNewImages = false;
+      for (let i = 0; i < 10; i++) { // Giả sử tối đa 10 ảnh
+        const imageUrlKey = `image_url_${i}`;
+        if (itemData[imageUrlKey]) {
+          if (!hasNewImages) {
+            // Chỉ xóa hình ảnh cũ nếu có hình ảnh mới và chưa xóa trước đó
+            await ProductImage.destroy({ where: { product_item_id: productItem.id } });
+            hasNewImages = true;
+          }
+
+          await ProductImage.create({
+            product_item_id: productItem.id,
+            image_url: itemData[imageUrlKey],
+          });
+        }
+      }
+    }
 
     res.status(200).json({
       success: true,
       message: "Cập nhật sản phẩm thành công",
-      data: product
+      data: product,
     });
   } catch (error) {
     console.error("Error updating product:", error);
@@ -331,6 +551,7 @@ const updateProduct = async (req, res) => {
     });
   }
 };
+
 
 const deleteProduct = async (req, res) => {
   try {
