@@ -11,46 +11,13 @@ class ShippingAddress extends Model {
 
 ShippingAddress.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    order_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: "Orders",
-        key: "id",
-      },
-    },
-    full_name: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    address_line_1: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    address_line_2: {
-      type: DataTypes.STRING(255),
-    },
-    city: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    postal_code: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    country: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    phone_number: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    order_id: { type: DataTypes.INTEGER, allowNull: false },
+    full_name: { type: DataTypes.STRING(255), allowNull: false },
+    street_address: { type: DataTypes.STRING(255), allowNull: false },
+    district: { type: DataTypes.STRING(100), allowNull: false },
+    ward: { type: DataTypes.STRING(100) }, 
+    phone_number: { type: DataTypes.STRING(20), allowNull: false },
   },
   {
     sequelize,
@@ -59,5 +26,6 @@ ShippingAddress.init(
     timestamps: false,
   }
 );
+
 
 export default ShippingAddress;

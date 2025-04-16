@@ -185,6 +185,14 @@ Orders.hasOne(ShippingAddress, { foreignKey: 'order_id' });
 ShippingAddress.belongsTo(Orders, { foreignKey: 'order_id' });
 
 
+// Product.js
+Product.hasMany(OrderItem, { foreignKey: 'productId' });
+
+// OrderItem.js
+OrderItem.belongsTo(Product, { foreignKey: 'productId' });
+
+
+
 
 // Export sequelize dưới dạng default
 const db = {

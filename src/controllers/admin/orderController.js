@@ -15,11 +15,11 @@ const VALID_ORDER_STATUSES = ['pending', 'paid', 'shipped', 'completed', 'cancel
 const getOrders = async (req, res) => {
   try {
     const orders = await Orders.findAll({
-      attributes: ["id", "customer_id", "total_amount", "status", "created_at"],
+      attributes: ["id", "total_amount", "status", "created_at"],
       include: [
         {
           model: Customer,
-          attributes: ["id", "email"],
+          attributes: ["email"],
           include: [
             {
               model: CustomerInfo,
@@ -27,6 +27,32 @@ const getOrders = async (req, res) => {
             },
           ],
         },
+        {
+          model: OrderItem,
+          attributes: ["id", "product_item_id", "quantity", "unit_price", "discounted_price"],
+          include: [
+            {
+              model: ProductItem,
+              attributes: ["id", "name", "price"],
+              include: [
+                {
+                  model: Product,
+                  attributes: ["id", "name", "price","image"],
+                 
+                }
+              ]
+            }
+          ]
+        },
+
+        {
+          model: Shipping,
+          attributes: ["id", "description", "price", "estimated_days"],
+        },
+        {
+          model: ShippingAddress,
+         attributes: ["id", "full_name","order_id", "phone_number", "street_address", "district", "ward"]
+        }
       ],
       order: [["created_at", "DESC"]],
     });
@@ -47,7 +73,7 @@ const getOrderById = async (req, res) => {
     }
 
     const order = await Orders.findByPk(id, {
-      attributes: ["id", "customer_id", "total_amount", "status", "created_at"],
+      attributes: ["id", "customer_id", "total_amount", "status", "shipping_fee","created_at","updated_at"],
       include: [
         {
           model: Customer,
@@ -69,15 +95,7 @@ const getOrderById = async (req, res) => {
               include: [
                 {
                   model: Product,
-                  attributes: ["name"],
-                  include: [
-                    {
-                      model: ProductImage,
-                      attributes: ["image_url"],
-                      where: { is_primary: true },
-                      required: false
-                    }
-                  ]
+                  attributes: ["name","image"],
                 }
               ]
             }
@@ -89,7 +107,7 @@ const getOrderById = async (req, res) => {
         },
         {
           model: ShippingAddress,
-          attributes: ["id", "full_name", "phone_number", "address_line_1", "address_line_2", "country", "city", "postal_code"]
+          attributes: ["id", "full_name","order_id", "phone_number", "street_address", "district", "ward"]
         }
       ]
     });

@@ -54,6 +54,9 @@ Orders.init(
     total_amount: {
       type: DataTypes.DECIMAL(10, 2),
     },
+    shipping_fee: {
+      type: DataTypes.DECIMAL(10, 2),
+    },
     status: {
       type: DataTypes.TEXT,
       validate: {
