@@ -29,6 +29,9 @@ CustomerInfo.init(
     fullname: {
       type: DataTypes.STRING(255),
     },
+    address: {
+      type: DataTypes.STRING(255),
+    },
     first_name: {
       type: DataTypes.STRING(255),
     },
