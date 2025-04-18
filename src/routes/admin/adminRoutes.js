@@ -6,6 +6,7 @@ import orderRoutes from "./orderRoutes.js";
 import categoryRoutes from "./categoryRoutes.js";
 import settingsRoutes from "./settingsRoutes.js";
 import dashboardRoutes from "./dashboardRoutes.js";
+import employeeRoutes from "./employeeRoutes.js";
 import  Middleware from "../../middleware/authMiddleware.js";
 
 const adminRoutes = express.Router();
@@ -29,5 +30,6 @@ adminRoutes.use("/orders", orderRoutes);
 adminRoutes.use("/categories", categoryRoutes);
 adminRoutes.use("/settings", settingsRoutes);
 adminRoutes.use("/dashboard", dashboardRoutes);
+adminRoutes.use("/employees", employeeRoutes);
 
 export default adminRoutes;
