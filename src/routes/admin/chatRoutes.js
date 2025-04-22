@@ -1,13 +1,18 @@
-import express from "express";
-import { closeConversation, getAllConversations, getMessagesByConversation, sendMessage, startConversation } from "../../controllers/admin/chatController.js";
+// src/routes/chatUploadRoutes.js
 
+import express from "express";
+import uploadChatImage from "../../middleware/chatUpload.js";
 
 const router = express.Router();
 
-router.post("/chat/start", startConversation);
-router.post("/chat/send", sendMessage);
-router.get("/chat/conversations", getAllConversations);
-router.get("/chat/messages/:conversation_id", getMessagesByConversation);
-router.put("/chat/close/:conversation_id", closeConversation);
+router.post("/upload", uploadChatImage.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded." });
+  }
+
+
+  const fileUrl = `/uploads/chat/${req.file.filename}`;
+  res.json({ url: fileUrl });
+});
 
 export default router;

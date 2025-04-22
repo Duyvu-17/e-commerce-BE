@@ -10,9 +10,9 @@ class ChatMessage extends Model {
 ChatMessage.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(36), 
       primaryKey: true,
-      autoIncrement: true,
+      allowNull: false
     },
     conversation_id: {
       type: DataTypes.INTEGER,
@@ -38,6 +38,14 @@ ChatMessage.init(
       type: DataTypes.JSON,
       allowNull: true,
     },
+    isRead: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    }
   },
   {
     sequelize,

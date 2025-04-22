@@ -40,6 +40,8 @@ import Transaction from './Transaction.js';
 import Wishlist from './Wishlist.js';
 import sequelize from '../config/database.js';
 import Role from './Role.js';
+import ChatConversation from './ChatConversation.js';
+import ChatMessage from './ChatMessage.js';
 
 
 Product.hasMany(ProductItem, { foreignKey: 'product_id' });
@@ -191,6 +193,17 @@ Product.hasMany(OrderItem, { foreignKey: 'productId' });
 // OrderItem.js
 OrderItem.belongsTo(Product, { foreignKey: 'productId' });
 
+// 🗨️ ChatConversation & Customer
+ChatConversation.belongsTo(Customer, { foreignKey: 'customer_id' });
+Customer.hasMany(ChatConversation, { foreignKey: 'customer_id' });
+
+// 🧑‍💼 ChatConversation & Employee
+ChatConversation.belongsTo(Employee, { foreignKey: 'employee_id' });
+Employee.hasMany(ChatConversation, { foreignKey: 'employee_id' });
+
+// 💬 ChatConversation & ChatMessage
+ChatConversation.hasMany(ChatMessage, { foreignKey: 'conversation_id' });
+ChatMessage.belongsTo(ChatConversation, { foreignKey: 'conversation_id' });
 
 
 

@@ -3,6 +3,7 @@ import Customer from '../models/Customer.js';
 import Employee from '../models/Employee.js';
 import ChatConversation from '../models/ChatConversation.js';
 import ChatMessage from '../models/ChatMessage.js';
+import { v4 as uuidv4 } from 'uuid'; // Thêm thư viện uuid để tạo ID
 
 const sampleMessages = [
   "Xin chào, tôi cần giúp đỡ!",
@@ -43,10 +44,11 @@ async function seedChatData() {
         last_message_time: new Date(),
       });
 
-      const createdAt = new Date(Date.now() - 1000 * 60 * 10); // 10 phút trước
+      const createdAt = new Date(Date.now() - 1000 * 60 * 10); 
 
       const messages = [
         {
+          id: uuidv4(), 
           conversation_id: conversation.id,
           sender_type: 'customer',
           sender_id: customer.id,
@@ -54,6 +56,7 @@ async function seedChatData() {
           timestamp: new Date(createdAt.getTime() + 1000 * 60 * 1),
         },
         {
+          id: uuidv4(), // Tạo UUID cho mỗi message
           conversation_id: conversation.id,
           sender_type: 'employee',
           sender_id: employee.id,
@@ -61,6 +64,7 @@ async function seedChatData() {
           timestamp: new Date(createdAt.getTime() + 1000 * 60 * 2),
         },
         {
+          id: uuidv4(), // Tạo UUID cho mỗi message
           conversation_id: conversation.id,
           sender_type: 'customer',
           sender_id: customer.id,
@@ -68,6 +72,7 @@ async function seedChatData() {
           timestamp: new Date(createdAt.getTime() + 1000 * 60 * 3),
         },
         {
+          id: uuidv4(), // Tạo UUID cho mỗi message
           conversation_id: conversation.id,
           sender_type: 'employee',
           sender_id: employee.id,

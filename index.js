@@ -7,6 +7,7 @@ import cors from "cors";
 import path from 'path';  
 import { Server } from 'socket.io';
 import http from 'http';
+import chatSocketHandler from './src/socket/chatSocket.js';
 
 const app = express();
 const CLIENT_URL = process.env.CLIENT_URL;
@@ -44,24 +45,25 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+chatSocketHandler(io)
 
-// Xử lý kết nối Socket.IO
-io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
+// // Xử lý kết nối Socket.IO
+// io.on('connection', (socket) => {
+//   console.log('Client connected:', socket.id);
 
-  socket.on('join_room', (roomId) => {
-    socket.join(roomId);
-    console.log(`User joined room: ${roomId}`);
-  });
+//   socket.on('join_room', (roomId) => {
+//     socket.join(roomId);
+//     console.log(`User joined room: ${roomId}`);
+//   });
 
-  socket.on('send_message', (data) => {
-    socket.to(data.room).emit('receive_message', data);
-  });
+//   socket.on('send_message', (data) => {
+//     socket.to(data.room).emit('receive_message', data);
+//   });
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-  });
-});
+//   socket.on('disconnect', () => {
+//     console.log('Client disconnected:', socket.id);
+//   });
+// });
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

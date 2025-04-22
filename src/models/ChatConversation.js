@@ -22,7 +22,7 @@ ChatConversation.init(
     },
     employee_id: {
       type: DataTypes.INTEGER,
-      allowNull: true, // chưa gán cũng được
+      allowNull: true, 
     },
     status: {
       type: DataTypes.ENUM("active", "closed"),
@@ -34,16 +34,14 @@ ChatConversation.init(
     last_message_time: {
       type: DataTypes.DATE,
     },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
   },
   {
     sequelize,
     modelName: "ChatConversation",
     tableName: "ChatConversation",
-    timestamps: false,
+    timestamps: true, 
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   }
 );
 
