@@ -1,4 +1,3 @@
-// models/Customer.js
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database.js";
 
@@ -38,11 +37,20 @@ Customer.init(
       allowNull: false,
       defaultValue: false,
     },
+    isOnline: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     status: {
       type: DataTypes.STRING,
       validate: {
         isIn: [['active', 'inactive', 'banned']],
-      },
+      }
+    },
+    last_activity: {
+      type: DataTypes.DATE,
+      allowNull: true,  
     },
     created_at: {
       type: DataTypes.DATE,

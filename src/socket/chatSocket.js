@@ -62,6 +62,7 @@ const chatSocketHandler = (io) => {
               Customer: {
                 email: customer?.email || '',
                 status: customer?.status || 'unknown',
+                isOnline:customer.isOnline,
                 info: customerInfo ? {
                   fullname: customerInfo.fullname,
                   first_name: customerInfo.first_name,

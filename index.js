@@ -47,23 +47,6 @@ const io = new Server(server, {
 });
 chatSocketHandler(io)
 
-// // Xử lý kết nối Socket.IO
-// io.on('connection', (socket) => {
-//   console.log('Client connected:', socket.id);
-
-//   socket.on('join_room', (roomId) => {
-//     socket.join(roomId);
-//     console.log(`User joined room: ${roomId}`);
-//   });
-
-//   socket.on('send_message', (data) => {
-//     socket.to(data.room).emit('receive_message', data);
-//   });
-
-//   socket.on('disconnect', () => {
-//     console.log('Client disconnected:', socket.id);
-//   });
-// });
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

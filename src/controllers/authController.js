@@ -61,7 +61,6 @@ const isValidPassword = (password) => {
 const register = async (req, res) => {
   const { fullname, email, password } = req.body;
   try {
-
     if (!fullname || !email || !password) {
       return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin." });
     }
@@ -71,7 +70,6 @@ const register = async (req, res) => {
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: "Email không hợp lệ." });
     }
-
 
     if (!isValidPassword(password)) {
       return res.status(400).json({
@@ -89,7 +87,8 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const customer = await Customer.create({
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      last_activity: new Date()  
     });
 
     // Create customer info
@@ -107,6 +106,7 @@ const register = async (req, res) => {
     res.status(500).json({ message: "Đã có lỗi xảy ra. Vui lòng thử lại." });
   }
 };
+
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -126,14 +126,18 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Email hoặc mật khẩu không đúng." });
     }
 
-    const [customerInfo, likedProducts, cart] = await Promise.all([
-      CustomerInfo.findOne({ where: { customerId: customer.id } }),
-      Wishlist.findAll({ where: { customerId: customer.id }, attributes: ["productId"] }),
-      Cart.findOne({ where: { customerId: customer.id } }),
+    customer.isOnline = true;
+    customer.last_activity = new Date();  
+    await customer.save();
+
+    const [customerInfo, likedProducts, cart] = await Promise.all([ 
+      CustomerInfo.findOne({ where: { customer_id : customer.id } }),
+      Wishlist.findAll({ where: { customer_id : customer.id }, attributes: ["product_id"] }),
+      Cart.findOne({ where: { customer_id : customer.id } }),
     ]);
 
     const cartItems = cart
-      ? await CartItem.findAll({ where: { cartId: cart.id }, attributes: ["productId", "quantity"] })
+      ? await CartItem.findAll({ where: { cartId: cart.id }, attributes: ["product_id", "quantity"] })
       : [];
 
     const token = jwt.sign({ id: customer.id, email: customer.email }, JWT_SECRET, {
@@ -149,6 +153,7 @@ const login = async (req, res) => {
         fullname: customerInfo?.fullname || "",
         avatar: customerInfo?.avatar || "",
         phone: customerInfo?.phone || "",
+        isOnline: customer.isOnline
       },
       likedProducts: likedProducts.map((item) => item.productId),
       cart: cartItems,
@@ -158,6 +163,8 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Đã có lỗi xảy ra. Vui lòng thử lại." });
   }
 };
+
+
 
 const socialLogin = async (req, res) => {
   const { email, name } = req.body;
@@ -376,11 +383,32 @@ const resetPassword = async (req, res) => {
     res.status(500).json({ message: "Đã có lỗi xảy ra. Vui lòng thử lại." });
   }
 };
+const logout = async (req, res) => {
+  const { userId } = req.body; 
+
+  try {
+    const customer = await Customer.findOne({ where: { id: userId } });
+    if (!customer) {
+      return res.status(404).json({ message: "Không tìm thấy khách hàng." });
+    }
+
+    customer.isOnline = false;
+    customer.last_activity = new Date();  
+    await customer.save(); 
+
+    res.json({ message: "Đăng xuất thành công!" });
+  } catch (error) {
+    console.error("Error during logout:", error);
+    res.status(500).json({ message: "Đã có lỗi xảy ra. Vui lòng thử lại." });
+  }
+};
+
 
 export default {
   register,
   resetPassword,
   customerForgotPassword,
   login,
-  socialLogin
+  socialLogin,
+  logout
 };
