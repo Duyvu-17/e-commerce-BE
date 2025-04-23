@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import Employee from "../../models/Employee.js";
 import Role from "../../models/Role.js"
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 
 // Hàm tạo access token
@@ -29,13 +30,13 @@ const getUserInfo = async (req, res) => {
     }
 
     const employee = await Employee.findByPk(req.employee.id, {
-      attributes: ["id", "email", "avatar", "full_name","role_id"],
+      attributes: ["id", "email", "avatar", "full_name", "role_id"],
     });
 
     if (!employee) {
       return res.status(404).json({ message: "Người dùng không tồn tại!" });
     }
-    
+
     let roleInfo = { id: employee.role_id };
     if (employee.role_id) {
       const role = await Role.findByPk(employee.role_id);
@@ -43,7 +44,7 @@ const getUserInfo = async (req, res) => {
         roleInfo = {
           id: role.id,
           name: role.name,
-          permissions: role.permissions, 
+          permissions: role.permissions,
         };
       }
     }
@@ -127,10 +128,10 @@ const login = async (req, res) => {
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Email không hợp lệ!" });
     }
-    
+
     // Tìm kiếm người dùng không kèm role
     const employee = await Employee.findOne({ where: { email } });
-    
+
     // Kiểm tra nếu không tìm thấy người dùng
     if (!employee) {
       return res.status(404).json({ message: "Tài khoản không tồn tại!" });
@@ -144,7 +145,7 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Mật khẩu không chính xác!" });
     }
-    
+
     // Tạo token và refresh token cho người dùng
     const token = await generateToken(employee);
     const refreshToken = await generateRefreshToken(employee);
@@ -157,14 +158,14 @@ const login = async (req, res) => {
 
     // Lấy thông tin role trong truy vấn riêng
     let roleInfo = { id: employee.role_id };
-    
+
     if (employee.role_id) {
       const role = await Role.findByPk(employee.role_id);
       if (role) {
         roleInfo = {
           id: role.id,
           name: role.name,
-          permissions: role.permissions 
+          permissions: role.permissions
         };
       }
     }
@@ -271,6 +272,131 @@ const verifyToken = async (req, res) => {
     res.status(500).json({ message: "Lỗi server!", error: error.message });
   }
 };
+const updateProfile = async (req, res) => {
+  console.log("Request body:", req.body);
+  console.log("Request file:", req.file);
+
+  try {
+    if (!req.employee || !req.employee.id) {
+      return res.status(401).json({ message: "Không có thông tin người dùng!" });
+    }
+
+    const { full_name, email } = req.body;
+    const employeeId = req.employee.id;
+
+    const employee = await Employee.findByPk(employeeId);
+    if (!employee) {
+      return res.status(404).json({ message: "Người dùng không tồn tại!" });
+    }
+
+    const updates = {};
+
+    if (full_name !== undefined) {
+      updates.full_name = full_name;
+    }
+
+    if (email !== undefined && email !== employee.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Email không hợp lệ!" });
+      }
+
+      const existingEmployee = await Employee.findOne({ where: { email } });
+      if (existingEmployee && existingEmployee.id !== employeeId) {
+        return res.status(400).json({ message: "Email đã được sử dụng bởi tài khoản khác!" });
+      }
+
+      updates.email = email;
+    }
+
+    if (req.file) {
+      const imagePath = `/uploads/profile/${req.file.filename}`;
+      updates.avatar = imagePath;
+      console.log("Updating avatar to:", imagePath);
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "Không có thông tin nào được cập nhật!" });
+    }
+
+    await Employee.update(updates, { where: { id: employeeId } });
+
+    const updatedEmployee = await Employee.findByPk(employeeId, {
+      attributes: ['id', 'email', 'full_name', 'avatar', 'role_id']
+    });
+
+    let roleInfo = { id: updatedEmployee.role_id };
+    if (updatedEmployee.role_id) {
+      const role = await Role.findByPk(updatedEmployee.role_id);
+      if (role) {
+        roleInfo = {
+          id: role.id,
+          name: role.name,
+          permissions: role.permissions,
+        };
+      }
+    }
+
+    res.json({
+      message: "Cập nhật thông tin thành công!",
+      user: {
+        id: updatedEmployee.id,
+        email: updatedEmployee.email,
+        full_name: updatedEmployee.full_name,
+        avatar: updatedEmployee.avatar,
+        role: roleInfo
+      }
+    });
+
+  } catch (error) {
+    console.error("Profile info update error:", error);
+    res.status(500).json({ message: "Lỗi server!", error: error.message });
+  }
+};
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    console.log(currentPassword, newPassword, confirmPassword);
+    
+    if (!req.employee || !req.employee.id) {
+      return res.status(401).json({ message: "Không xác thực được người dùng!" });
+    }
+
+    const employeeId = req.employee.id;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "Thiếu mật khẩu hiện tại hoặc mật khẩu mới!" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Mật khẩu xác nhận không khớp!" });
+    }
+
+    const employee = await Employee.findByPk(employeeId);
+    if (!employee) {
+      return res.status(404).json({ message: "Người dùng không tồn tại!" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, employee.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Mật khẩu hiện tại không chính xác!" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Mật khẩu mới phải có ít nhất 6 ký tự!" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await Employee.update({ password: hashedPassword }, { where: { id: employeeId } });
+
+    res.json({ message: "Cập nhật mật khẩu thành công!" });
+
+  } catch (error) {
+    console.error("Password update error:", error);
+    res.status(500).json({ message: "Lỗi server!", error: error.message });
+  }
+};
+
 
 
 // Đăng xuất
@@ -292,7 +418,7 @@ const logout = async (req, res) => {
 };
 
 const authController = {
-  register, login, verifyToken, logout, refreshToken,getUserInfo
+  register, login, verifyToken, logout, refreshToken, getUserInfo, updateProfile, changePassword
 };
 
 export default authController;

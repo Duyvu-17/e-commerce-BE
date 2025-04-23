@@ -8,6 +8,7 @@ import settingsRoutes from "./settingsRoutes.js";
 import dashboardRoutes from "./dashboardRoutes.js";
 import employeeRoutes from "./employeeRoutes.js";
 import chatRoutes from "./chatRoutes.js";
+import profileRoutes from "./profileRoutes.js";
 import Middleware from "../../middleware/authMiddleware.js";
 
 const adminRoutes = express.Router();
@@ -25,6 +26,7 @@ adminRoutes.get("/auth/me", Middleware.authMiddleware, authController.getUserInf
 adminRoutes.use(Middleware.authMiddleware);
 adminRoutes.use(Middleware.adminMiddleware);
 adminRoutes.use("/chat", chatRoutes);
+adminRoutes.use("/profile", profileRoutes);
 adminRoutes.use("/customers", customerRoutes);
 adminRoutes.use("/products", productRoutes);
 adminRoutes.use("/orders", orderRoutes);
